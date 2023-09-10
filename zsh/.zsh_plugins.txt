@@ -1,0 +1,8 @@
+romkatv/powerlevel10k
+marlonrichert/zsh-autocomplete
+zsh-users/zsh-autosuggestions
+hlissner/zsh-autopair
+zdharma-continuum/fast-syntax-highlighting
+zsh-users/zsh-history-substring-search
+zdharma-continuum/history-search-multi-word
+Aloxaf/fzf-tab
