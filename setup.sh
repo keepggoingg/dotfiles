@@ -219,6 +219,16 @@ EOL
 systemctl --user start mpris-proxy.service
 systemctl --user enable mpris-proxy.service
 
+
+mkdir -p ~/.gnupg/
+cat > ~/.gnupg/gpg-agent.conf << EOL
+pinentry-program /usr/bin/pinentry-gnome3
+
+max-cache-ttl 60480000
+default-cache-ttl 60480000
+EOL
+
+# 2.5.8-2
 sudo downgrade openvpn
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
