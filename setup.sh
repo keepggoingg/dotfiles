@@ -160,7 +160,7 @@ PASS_REPO="git@github.com:endo000/pass.git"
 NVIM_REPO="git@github.com:endo000/nvim.git"
 OBSIDIAN_REPO="git@github.com:endo000/obsidian.git"
 
-git clone "$DOTFILES_REPO" ~
+git clone "$DOTFILES_REPO" ~/.config
 
 git clone "$PASS_REPO" ~/.config/pass
 echo "export PASSWORD_STORE_DIR=$HOME/.config/pass" >> ~/.bashrc
