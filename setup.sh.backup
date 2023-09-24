@@ -52,6 +52,8 @@ yes | yay -S \
   browserpass-chromium \
   android-file-transfer \
   xdg-desktop-portal-wlr \
+  nvidia \
+  nvidia-exec \
 
   # KVM QEMU libvirt
   qemu-full \
@@ -78,6 +80,11 @@ yes | yay -S \
   openvpn \
   openvpn-update-resolv-conf-git \
   openfortivpn \
+  sqlc \
+  rsync \
+  pwgen \
+  protoc \
+  rate-mirrors \
 
   # gui apps
   alacritty \
@@ -99,7 +106,14 @@ yes | yay -S \
   nm-connection-editor \
   cpupower \
   cpupower-gui \
-
+  firefox \
+  teamviewer \
+  qbittorrent \
+  vlc \
+  mpv \
+  thunderbird \
+  feh \
+  steam \
 
   # zsh
   zsh \
@@ -153,8 +167,15 @@ yes | yay -S \
   android-sdk-cmdline-tools-latest
 
 # Add this kernel parameters to /boot/loader/entries/*_linux.conf
+#
+# To fix crash boot caused by ssd
 # nvme_core.default_ps_max_latency_us=0
+#
+# To run sway
 # nvidia_drm.modeset=1
+# And also this for sway run command
+# (/usr/share/wayland-sessions/sway.desktop)
+# --unsupported-gpu
 
 echo export EDITOR=nvim | sudo tee -a /etc/environment
 echo export JAVA_HOME=/usr/lib/jvm/java-11-openjdk | sudo tee -a /etc/environment
@@ -257,23 +278,11 @@ sudo chown aleksandr:aleksandr /opt/android-sdk
 
 sudo systemctl enable --now docker.service
 sudo usermod -aG docker aleksandr
-yay -S firefox
-yay -S teamviewer
-yay -S protoc
-yay -S rsync
 
 go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
 go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
 go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
-yay -S sqlc
-yay -S qbittorrent
-yay -S vlc
-yay -S pwgen
-yay -S mpv
-yay -S thunderbird
-yay -S feh
-yay -S rate-mirrors
-yay -S nvidia
-yay -S steam
-yay -S nvidia-exec
+yay -S nvidia-settings
+yay -S sway-audio-idle-inhibit
+yay -S sway-audio-idle-inhibit-git

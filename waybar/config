@@ -18,6 +18,7 @@
     "temperature",
     "sway/language",
     "idle_inhibitor",
+    "custom/audio_idle_inhibitor",
     "clock",
     "battery"
   ],
@@ -96,6 +97,18 @@
       "deactivated": "󰌾"
     }
   },
+  "custom/audio_idle_inhibitor": {
+		"format": "{icon}",
+		"exec": "sway-audio-idle-inhibit --dry-print-both-waybar",
+		"exec-if": "which sway-audio-idle-inhibit",
+		"return-type": "json",
+		"format-icons": {
+			"output": "󱨖",
+			"input": "",
+			"output-input": "󱨖 ",
+			"none": ""
+		}
+	},
   "clock": {
     "format": "{:%H:%M}  ",
     "format-alt": "{:%a, %b %d %H:%M}  ",

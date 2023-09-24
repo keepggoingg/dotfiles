@@ -76,6 +76,7 @@ tooltip label {
 #clock,
 #language,
 #idle_inhibitor,
+#custom-audio_idle_inhibitor,
 #tray,
 #backlight {
     background-color: transparent;
@@ -99,6 +100,7 @@ tooltip label {
 #clock,
 #language,
 #idle_inhibitor,
+#custom-audio_idle_inhibitor,
 #tray,
 #backlight {
     border-bottom: 3px solid white;
