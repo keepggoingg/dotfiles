@@ -12,4 +12,3 @@ if [[ $? -ne 0 ]]; then
 fi
 
 echo "$1" >> setup.sh
-cp setup.sh setup.sh.backup

@@ -185,6 +185,8 @@ PASS_REPO="git@github.com:endo000/pass.git"
 NVIM_REPO="git@github.com:endo000/nvim.git"
 OBSIDIAN_REPO="git@github.com:endo000/obsidian.git"
 
+git config --global --add --bool push.autoSetupRemote true
+
 git clone "$DOTFILES_REPO" ~/.config
 
 git clone "$PASS_REPO" ~/.config/pass
@@ -286,3 +288,7 @@ go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 yay -S nvidia-settings
 yay -S sway-audio-idle-inhibit
 yay -S sway-audio-idle-inhibit-git
+yay -S batsignal
+yay -S paper-icon-theme
+yay -S tumbler
+yay -S breeze-icons
