@@ -31,6 +31,13 @@ exec swaykbdd
 exec sway-audio-idle-inhibit
 exec batsignal -w 30 -c 10 -d 5 -f 100 -I xfce-battery-full
 
+### Idle configuration
+exec swayidle \
+    timeout 300 'swaylock' \
+    timeout 360 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+    before-sleep 'swaymsg "output * enable" && swaylock'
+# before-sleep 'swaylock'
+
 set $gnome-schema org.gnome.desktop.interface
 
 exec gsettings set $gnome-schema gtk-theme 'Dracula'
@@ -94,7 +101,8 @@ client.placeholder #002b36 #002b36 #93a1a1 #b58900 #b58900
 client.background #002b36
 
 set $wallpaper_path $HOME/.config/sway/bg2.jpg
-output * max_render_time 5 bg $wallpaper_path fill
+# output * max_render_time 5 bg $wallpaper_path fill
+output * bg $wallpaper_path fill
 
 ### Output configuration
 
@@ -136,11 +144,6 @@ output "ViewSonic Corporation VA1655-FHD WMM222320614" {
     resolution 1920x1080@60Hz
 }
 
-### Idle configuration
-exec swayidle \
-    timeout 300 'swaylock' \
-    timeout 360 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-    before-sleep 'swaylock'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
