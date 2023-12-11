@@ -35,8 +35,8 @@ exec batsignal -w 30 -c 10 -d 5 -f 100 -I xfce-battery-full
 exec swayidle \
     timeout 300 'swaylock' \
     timeout 360 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-    before-sleep 'swaymsg "output * enable" && swaylock'
-# before-sleep 'swaylock'
+    before-sleep 'swaylock'
+    # before-sleep 'swaymsg "output * enable" && swaylock'
 
 set $gnome-schema org.gnome.desktop.interface
 
@@ -51,8 +51,8 @@ exec hash dbus-update-activation-environment 2>/dev/null && \
      dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
 
 ### Bindswitch
-bindswitch lid:on exec swaymsg "output eDP-1 disable"
-bindswitch lid:off exec swaymsg "output eDP-1 enable"
+# bindswitch lid:on exec swaymsg "output eDP-1 disable"
+# bindswitch lid:off exec swaymsg "output eDP-1 enable"
 
 ### Window rules
 for_window [app_id="^.*"] border pixel 2
@@ -100,14 +100,14 @@ client.urgent #dc322f #cb4b16 #fdf6e3 #d33682 #dc322f
 client.placeholder #002b36 #002b36 #93a1a1 #b58900 #b58900
 client.background #002b36
 
-set $wallpaper_path $HOME/.config/sway/bg2.jpg
+set $wallpaper_path $HOME/.config/sway/bg1.jpg
 # output * max_render_time 5 bg $wallpaper_path fill
 output * bg $wallpaper_path fill
 
 ### Output configuration
 
 output "eDP-1" {
-    position 0,0
+    # position 0,0
     resolution 1920x1080@60Hz
 }
 
@@ -123,12 +123,17 @@ output "Dell Inc. DELL U2414H X4J7181J24YL" {
     resolution 1920x1080@60Hz
 }
 
+output "Samsung Electric Company SAMSUNG 0x00000F00" {
+    position 0,0
+    resolution 1920x1080@60Hz
+}
+
 # Home
 output "LG Electronics LG ULTRAGEAR 101NTDVM8330" {
     # position 1920,0
-    # resolution 1920x1080@60Hz
     position 0,0
     resolution 2560x1440@100Hz
+    # resolution 1920x1080@60Hz
 }
 
 output "Lenovo Group Limited LEN LT2223pwC VN-054956" {
@@ -179,6 +184,9 @@ input "type:touchpad" {
 
     bindsym Print exec shotman --capture region --copy
     bindsym Shift+Print exec shotman --capture output --copy
+
+    bindsym $mod+Shift+F1 exec swaymsg "output eDP-1 disable"
+    bindsym $mod+Shift+F2 exec swaymsg "output eDP-1 enable"
 
     bindsym $mod+F10 exec (killall -s SIGINT wf-recorder && \
       notify-send "Record saved" "Record saved to $HOME/screenshots folder") \

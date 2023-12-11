@@ -38,7 +38,6 @@ yes | yay -S \
   pinentry \
   gnupg \
   openssh \
-  ntfs3 \
   bolt \
   glibc \
   lib32-glibc \
@@ -50,7 +49,6 @@ yes | yay -S \
   xorg-xwayland \
   browserpass \
   browserpass-chromium \
-  android-file-transfer \
   xdg-desktop-portal-wlr \
   nvidia \
   nvidia-exec \
@@ -158,6 +156,7 @@ yes | yay -S \
   android-platform-29 \
   android-platform-30 \
   android-platform-31 \
+  android-platform-32 \
   android-platform-33 \
   android-sdk-platform-tools \
   android-sdk-build-tools \
@@ -292,3 +291,33 @@ yay -S batsignal
 yay -S paper-icon-theme
 yay -S tumbler
 yay -S breeze-icons
+yay -S zoom
+yay -S ntfs-3g
+yay -S libreoffice-still
+yay -S auto-cpufreq
+systemctl enable --now auto-cpufreq
+yay -S simple-mtpfs
+yay -S gvfs
+yay -S ffmpegthumbnailer
+yay -S tumbler-extra-thumbnailers
+yay -S file-roller
+yay -S thunar-archive-plugin
+yay -S gvfs-mtp
+yay -S gvfs-gphoto2
+yay -S python pyenv
+yay -S spotify
+yay -S python-debugpy
+yay -S blueman
+yay -S checkmake
+yay -S urlview
+yay -S cuda-11.7 cudnn8-cuda11.0
+yay -S anaconda
+
+export LD_LIBRARY_PATH=/opt/cuda-11.7/lib64:/usr/include
+yay -S jupyterlab jupyter-notebook
+yay -S networkmanager-openvpn
+yay -S remmina-plugin-rdesktop
+yay -S ydotool
+yay -S calc
+yay -S cava
+yay -S cmatrix

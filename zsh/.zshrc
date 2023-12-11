@@ -104,6 +104,12 @@ function vpnlabex() {
   unset CONFIG_FOLDER
 }
 
+function condastart () {
+  source /opt/anaconda/bin/activate root
+  export PATH="/opt/anaconda/bin:$PATH"
+  export LD_LIBRARY_PATH=/opt/anaconda/lib:/home/aleksandr/.conda/envs/classification/lib
+}
+
 if test -n "$KITTY_INSTALLATION_DIR"; then
   autoload -Uz -- "$KITTY_INSTALLATION_DIR"/shell-integration/zsh/kitty-integration
   kitty-integration
