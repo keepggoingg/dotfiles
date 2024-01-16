@@ -121,7 +121,7 @@ bindkey "^[[1;5D" backward-word
 
 # Aliases
 
-alias emu='QT_QPA_PLATFORM=xcb emulator -avd "Pixel_6_API_28" -writable-system'
+alias emu='QT_QPA_PLATFORM=xcb emulator -avd "Pixel_6_API_28" -writable-system -gpu host'
 alias f='fvm flutter'
 
 alias exa='exa '\''--icons'\'''
