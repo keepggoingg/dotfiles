@@ -50,6 +50,8 @@ exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
 exec hash dbus-update-activation-environment 2>/dev/null && \
      dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
 
+exec /usr/lib/xfce-polkit/xfce-polkit
+
 ### Bindswitch
 # bindswitch lid:on exec swaymsg "output eDP-1 disable"
 # bindswitch lid:off exec swaymsg "output eDP-1 enable"
@@ -106,7 +108,7 @@ output * bg $wallpaper_path fill
 
 ### Output configuration
 
-output "eDP-1" {
+output "Samsung Display Corp. 0x4165 Unknown" {
     # position 0,0
     resolution 1920x1080@60Hz
 }
