@@ -16,6 +16,7 @@ path=(
   $HOME/.pub-cache/bin
   $HOME/Library/Android/sdk/platform-tools
   $BUN_INSTALL/bin
+  /Applications/kitty.app/Contents/MacOS   # kitty, kitten
   $path
 )
 typeset -U path
