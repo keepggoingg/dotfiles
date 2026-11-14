@@ -1,10 +1,1 @@
-alacritty/themes
-
-kitty/kitty-themes
-
-tmux/tmux.conf
-tmux/plugins
-
-zsh/.antidote
-zsh/.zcompdump
-zsh/.zsh_plugins.zsh
+.DS_Store

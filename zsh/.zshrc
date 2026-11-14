@@ -1,142 +1,71 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-zmodload zsh/zprof
-
-typeset -U path cdpath fpath manpath
-
-HELPDIR="/usr/share/zsh/$ZSH_VERSION/help"
-
-# Use emacs keymap as the default.
+# ---- Options -----------------------------------------------------------------
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=200000
+SAVEHIST=200000
+setopt extended_history share_history hist_ignore_all_dups hist_ignore_space \
+       hist_reduce_blanks hist_verify
+setopt auto_cd auto_pushd pushd_ignore_dups pushd_silent interactive_comments
+setopt extended_glob no_beep
 bindkey -e
 
-autoload -Uz compinit && compinit
-# autoload -Uz compinit promptinit
-# compinit
-# promptinit
+# ---- Completion (dump rebuilt once a day, otherwise -C for speed) -------------
+mkdir -p "$HOME/.cache/zsh"
+# /usr/local/share/zsh is a group-writable leftover of Intel Homebrew; compinit refuses it.
+fpath=(${fpath:#/usr/local/share/zsh/*})
+autoload -Uz compinit
+_zcd="$HOME/.cache/zsh/zcompdump"
+if [[ -n $_zcd(#qN.mh+24) || ! -f $_zcd ]]; then compinit -d "$_zcd"; else compinit -C -d "$_zcd"; fi
+unset _zcd
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' menu no
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':fzf-tab:*' switch-group '<' '>'
+zstyle ':fzf-tab:complete:(cd|z|__zoxide_z):*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
 
-# eval "$(zoxide init zsh)"
-eval "$(lua /usr/share/z.lua/z.lua --init zsh)"
+# ---- Plugins (antidote; `antidote update` to upgrade, never automatic) --------
+source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
+antidote load "$HOME/.config/zsh/plugins.txt" "$HOME/.cache/zsh/plugins.zsh"
+bindkey '^y' autosuggest-accept
+
+# ---- Tools ---------------------------------------------------------------------
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+export FZF_DEFAULT_OPTS='--height 40% --layout reverse --border'
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range :300 {}'"
+source <(fzf --zsh)            # Ctrl-R history, Ctrl-T files, Alt-C dirs
+eval "$(zoxide init zsh)"      # z <dir>, zi = interactive
 eval "$(direnv hook zsh)"
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-[[ ! -f ${ZDOTDIR}/.p10k.zsh ]] || source ${ZDOTDIR}/.p10k.zsh
+export BAT_THEME=ansi          # follows the kitty palette
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-## home-manager/antidote begin :
-source ${ZDOTDIR:-~}/.antidote/antidote.zsh
+# SDKMAN is heavy; load it only when `sdk` is called.
+sdk() { unfunction sdk; source "$SDKMAN_DIR/bin/sdkman-init.sh"; sdk "$@"; }
 
-antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+[[ -s "$BUN_INSTALL/_bun" ]] && source "$BUN_INSTALL/_bun"
+[[ -f "$HOME/.dart-cli-completion/zsh-config.zsh" ]] && source "$HOME/.dart-cli-completion/zsh-config.zsh"
 
-# History options should be set in .zshrc and after oh-my-zsh sourcing.
-# See https://github.com/nix-community/home-manager/issues/177.
-HISTSIZE="10000"
-SAVEHIST="10000"
+source "$HOME/.config/zsh/aliases.zsh"
 
-HISTFILE="${HOME}/.local/share/zsh/zsh_history"
-mkdir -p "$(dirname "$HISTFILE")"
+# ---- Arrow keys: Normal (^[[A) and Application (^[OA) modes -------------------
+# Prefix history search on Up/Down in both forms, and leave Application Keypad
+# Mode before each prompt (a crashed TUI can leave it on).
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search add-zsh-hook
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+for _km in emacs viins vicmd; do
+  bindkey -M $_km '^[[A' up-line-or-beginning-search
+  bindkey -M $_km '^[OA' up-line-or-beginning-search
+  bindkey -M $_km '^[[B' down-line-or-beginning-search
+  bindkey -M $_km '^[OB' down-line-or-beginning-search
+done
+unset _km
+_reset_keypad_mode() { echoti rmkx 2>/dev/null }
+add-zsh-hook precmd _reset_keypad_mode
 
-setopt HIST_FCNTL_LOCK
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_IGNORE_SPACE
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt SHARE_HISTORY
-unsetopt EXTENDED_HISTORY
+# Machine-only settings and secrets (not in the repo).
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
-setopt NO_NOMATCH
-setopt noglob
-
-
-if [[ $options[zle] = on ]]; then
-  . /usr/share/fzf/completion.zsh
-  . /usr/share/fzf/key-bindings.zsh
-fi
-
-function gitconfig() {
-  git config user.name "$(pass show "$1"/credentials/name)"
-  git config user.email "$(pass show "$1"/credentials/email)"
-}
-
-function sshpi() {
-  ssh $(pass show personal/hostnames/pi)
-}
-
-function sshres() {
-  ssh $(pass show result/ssh/coci/"$1")
-}
-
-function vpnres() {
-  CONFIG_FOLDER="/home/aleksandr/.config/vpn"
-  VPN_FOLDER="$CONFIG_FOLDER"/result
-  PASS_FILE="$VPN_FOLDER"/pass.txt 
-  if [[ ! -f "$PASS_FILE" ]]; then
-    echo "create pass.txt"
-    pass show result/vpn/username >> "$PASS_FILE"
-    pass show result/vpn/password >> "$PASS_FILE"
-  fi
-  sudo openvpn --config "$VPN_FOLDER"/result.ovpn \
-    --auth-user-pass "$PASS_FILE" \
-    --script-security 2 \
-    --up /etc/openvpn/update-resolv-conf \
-    --down /etc/openvpn/update-resolv-conf \
-    --down-pre
-  unset PASS_FILE
-  unset VPN_FOLDER
-  unset CONFIG_FOLDER
-}
-
-function vpnlabex() {
-  CONFIG_FOLDER="/home/aleksandr/.config/vpn"
-  VPN_FOLDER="$CONFIG_FOLDER"/labex
-  PASS_FILE="$VPN_FOLDER"/pass.txt 
-  if [[ ! -f "$PASS_FILE" ]]; then
-    echo "create pass.txt"
-    echo "host =" $(pass show result/labex/vpn/host) >> "$PASS_FILE"
-    echo "username =" $(pass show result/labex/vpn/username) >> "$PASS_FILE"
-    echo "password =" $(pass show result/labex/vpn/password) >> "$PASS_FILE"
-  fi
-  sudo openfortivpn -c $PASS_FILE
-  unset PASS_FILE
-  unset VPN_FOLDER
-  unset CONFIG_FOLDER
-}
-
-function condastart () {
-  source /opt/anaconda/bin/activate root
-  export PATH="/opt/anaconda/bin:$PATH"
-  export LD_LIBRARY_PATH=/opt/anaconda/lib:/home/aleksandr/.conda/envs/classification/lib
-}
-
-if test -n "$KITTY_INSTALLATION_DIR"; then
-  autoload -Uz -- "$KITTY_INSTALLATION_DIR"/shell-integration/zsh/kitty-integration
-  kitty-integration
-  unfunction kitty-integration
-fi
-
-bindkey "^[[1;5C" forward-word
-bindkey "^[[1;5D" backward-word
-
-# Aliases
-
-alias emu='QT_QPA_PLATFORM=xcb emulator -avd "Pixel_6_API_28" -writable-system -gpu host'
-alias f='fvm flutter'
-
-alias exa='exa '\''--icons'\'''
-alias la='exa -a'
-alias ll='exa -l'
-alias lla='exa -la'
-alias ls='exa'
-alias lt='exa --tree'
-
-alias vim="nvim"
-alias vi="nvim"
-alias vimdiff='nvim -d'
-
-if [[ "$TERM" = "xterm-kitty" ]]; then
-  alias ssh="kitty +kitten ssh"
-  alias icat="kitty +kitten icat"
-  alias diff="kitty +kitten diff"
-fi
+eval "$(starship init zsh)"

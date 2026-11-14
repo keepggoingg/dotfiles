@@ -1,0 +1,156 @@
+" =========================
+" General behavior
+" =========================
+set number
+set relativenumber
+set scrolloff=8
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+set clipboard=unnamedplus
+set ideajoin
+set idearefactormode=keep
+set surround
+
+" Better splits (works inside editor splits)
+set splitbelow
+set splitright
+
+" =========================
+" Leader
+" =========================
+let mapleader=" "
+
+" =========================
+" Navigation improvements
+" =========================
+
+" Better wrapped line movement
+nmap j gj
+nmap k gk
+
+" Keep cursor centered on search
+nmap n nzzzv
+nmap N Nzzzv
+
+" Faster escape
+inoremap jk <Esc>
+
+" =========================
+" IntelliJ actions mapping
+" =========================
+
+" Go to definition
+nmap gd <Action>(GotoDeclaration)
+
+" Go to implementation
+nmap gi <Action>(GotoImplementation)
+
+" Go to usages
+nmap gu <Action>(FindUsages)
+
+" Recent files
+nmap <leader>fr <Action>(RecentFiles)
+
+" Search everywhere
+nmap <leader>ff <Action>(SearchEverywhere)
+
+" Rename (very important for Spring work)
+nmap <leader>rn <Action>(RenameElement)
+
+" Reformat file
+nmap <leader>cf <Action>(ReformatCode)
+
+" Optimize imports
+nmap <leader>oi <Action>(OptimizeImports)
+
+" Show intention actions (like Alt+Enter)
+nmap <leader>a <Action>(ShowIntentionActions)
+
+" Run
+nmap <leader>rr <Action>(Run)
+
+" Debug
+nmap <leader>rd <Action>(Debug)
+
+" =========================
+" Debug navigation
+" =========================
+nmap <leader>db <Action>(ToggleLineBreakpoint)
+nmap <leader>dc <Action>(Resume)
+nmap <leader>do <Action>(StepOver)
+nmap <leader>di <Action>(StepInto)
+nmap <leader>dO <Action>(StepOut)
+nmap <leader>de <Action>(EvaluateExpression)
+
+" Toggle terminal
+nmap <leader>tt <Action>(ActivateTerminalToolWindow)
+
+" Toggle project view
+nmap <leader>e <Action>(ActivateProjectToolWindow)
+
+" Next / previous error in file
+nmap ]e <Action>(GotoNextError)
+nmap [e <Action>(GotoPreviousError)
+
+nmap K <Action>(QuickJavaDoc)
+
+" Comment / uncomment line or selection
+nmap gcc <Action>(CommentByLineComment)
+vmap gc  <Action>(CommentByLineComment)
+
+" Block comment
+nmap gbc <Action>(CommentByBlockComment)
+vmap gb  <Action>(CommentByBlockComment)
+
+" =========================
+" Git navigation
+" =========================
+
+" Next / previous change (like ]g / [g in vim-gitgutter)
+nmap ]g <Action>(VcsShowNextChangeMarker)
+nmap [g <Action>(VcsShowPrevChangeMarker)
+
+" Show diff popup for current change
+nmap <leader>gd <Action>(ShowDiff)
+
+" Annotate (git blame)
+nmap <leader>gb <Action>(Annotate)
+
+" Git commit window
+nmap <leader>gc <Action>(CheckinProject)
+
+" Git log for file
+nmap <leader>gl <Action>(VcsShowHistoryForFile)
+
+" =========================
+" Window navigation
+" =========================
+nmap <C-h> <C-w>h
+nmap <C-j> <C-w>j
+nmap <C-k> <C-w>k
+nmap <C-l> <C-w>l
+
+" =========================
+" Tabs
+" =========================
+nmap <leader>1 1gt
+nmap <leader>2 2gt
+nmap <leader>3 3gt
+nmap <leader>tn :tabnew<CR>
+
+" Next / previous buffer (editor tab)
+nmap ]b <Action>(NextTab)
+nmap [b <Action>(PreviousTab)
+
+" Flutter Hot Reload
+nmap <leader>hr <Action>(Flutter.HotReload)
+
+" Flutter Hot Restart
+nmap <leader>hR <Action>(Flutter.HotRestart)
+
+nmap zc <Action>(CollapseRegion)
+nmap zo <Action>(ExpandRegion)
+nmap zM <Action>(CollapseAllRegions)
+nmap zR <Action>(ExpandAllRegions)
