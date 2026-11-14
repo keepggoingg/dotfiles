@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Pick a git repo under ~/dev (or pass a path) and switch to its tmux session,
+# creating it in that directory if needed. Bound to prefix f; also `t` in zsh.
+set -euo pipefail
+
+if [[ $# -gt 0 ]]; then
+  dir=$(cd "$1" && pwd)
+else
+  dir=$( {
+      echo "$HOME/dev/result/eearly"
+      fd --hidden --no-ignore --type d --max-depth 5 --prune '^\.git$' "$HOME/dev" \
+         --exclude node_modules --exclude .dart_tool --exclude build --exclude Pods \
+         -x dirname {} | sort
+    } | sed "s|^$HOME/||" \
+      | fzf --prompt 'project> ' --reverse --no-border \
+            --preview "eza -1 --icons=always --group-directories-first $HOME/{}" \
+      | sed "s|^|$HOME/|" ) || exit 0
+fi
+[[ -n "$dir" ]] || exit 0
+
+name=$(basename "$dir" | tr '.:' '__')
+# Same folder name in two places (e.g. opensource copies): prefix the parent.
+if tmux has-session -t "=$name" 2>/dev/null &&
+   [[ "$(tmux display -p -t "=$name:" '#{session_path}')" != "$dir" ]]; then
+  name="$(basename "$(dirname "$dir")" | tr '.:' '__')-$name"
+fi
+
+tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$dir"
+if [[ -n "${TMUX:-}" ]]; then
+  tmux switch-client -t "=$name"
+else
+  tmux attach -t "=$name"
+fi

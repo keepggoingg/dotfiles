@@ -21,3 +21,4 @@ x() {
     *) echo "x: don't know how to extract '$1'" >&2; return 1 ;;
   esac
 }
+alias t='tmux-sessionizer'

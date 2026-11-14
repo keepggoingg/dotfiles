@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 DOTFILES="$PWD"
-PACKAGES=(zsh kitty tmux nvim ideavim starship git direnv)
+PACKAGES=(zsh kitty tmux nvim ideavim starship git direnv bin)
 
 if ! command -v brew >/dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -14,12 +14,10 @@ brew bundle --file="$DOTFILES/Brewfile" || echo "brew bundle had failures (often
 # Java/Maven via SDKMAN (the shell only puts its current versions on PATH)
 [[ -d "$HOME/.sdkman" ]] || curl -s "https://get.sdkman.io?rcupdate=false" | bash
 
-# oh-my-tmux base config; tmux.conf.local comes from the tmux package
-if [[ ! -d "$HOME/.local/share/tmux/oh-my-tmux" ]]; then
-  git clone --depth 1 https://github.com/gpakosz/.tmux.git "$HOME/.local/share/tmux/oh-my-tmux"
+# tmux plugin manager; plugins are installed after stow below
+if [[ ! -d "$HOME/.config/tmux/plugins/tpm" ]]; then
+  git clone --depth 1 https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
 fi
-mkdir -p "$HOME/.config/tmux"
-ln -sfn "$HOME/.local/share/tmux/oh-my-tmux/.tmux.conf" "$HOME/.config/tmux/tmux.conf"
 
 # Move real files that would block stow into a dated backup, then link.
 # Only files are moved; existing directories are left for stow to link into.
@@ -38,4 +36,5 @@ done
 stow --dir "$DOTFILES" --target "$HOME" --restow "${PACKAGES[@]}"
 
 [[ -f "$HOME/.z" ]] && command -v zoxide >/dev/null && zoxide import z --merge || true
+"$HOME/.config/tmux/plugins/tpm/bin/install_plugins" || true
 echo "Done. Open a new terminal."
