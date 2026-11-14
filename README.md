@@ -56,3 +56,29 @@ Prefix is `Ctrl-Space`. `prefix r` reloads, `prefix I` installs plugins.
 | `prefix g` | lazygit popup |
 | `prefix Enter`, `v`, `y` | copy mode, select, copy to macOS clipboard |
 | `prefix C-s` / `C-r` | save / restore sessions (also autosaved every 15 min) |
+
+## Neovim notes
+
+LazyVim with extras for Java, Dart, SQL, YAML, Python, Docker, plus debugger
+(nvim-dap), tests (neotest) and tasks (overseer). Leader is `Space`;
+`Space` and a pause shows every key in which-key.
+
+- Java: jdtls (+ Lombok, java-debug, java-test) and the Spring Boot language
+  server. jdtls itself runs on Homebrew `openjdk` (needs 25+); projects compile
+  with the SDKMAN JDKs listed in `lua/plugins/java.lua`.
+- Flutter: flutter-tools with the project's FVM SDK (`.fvm/flutter_sdk`).
+
+| keys | action |
+|------|--------|
+| `Space Space`, `Space /` | find file, grep |
+| `gd` `gr` `gI` `K` | definition, references, implementation, docs |
+| `Space ca`, `Space cr` | code action, rename |
+| `Space co`, `Space cxv/cxc` | Java: organize imports, extract variable/constant |
+| `Space cgs` | Java: go to super method |
+| `Space Fr/Fh/FR/Fq` | Flutter: run, hot reload, hot restart, quit |
+| `Space Fd/Fe/Fl/Fo` | Flutter: devices, emulators, log, widget outline |
+| `Space tr/tt/ts/td` | test nearest / file, summary, debug nearest |
+| `Space db/dc/dO/di/du` | breakpoint, continue, step over/into, debug UI |
+| `Space oo`, `Space ow` | run a task (mvnw, npm, make...), task list |
+| `Space D` | database UI (dadbod) |
+| `Space gg` | lazygit |

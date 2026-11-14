@@ -37,6 +37,7 @@ brew "helm"
 brew "minikube"
 brew "crane"
 brew "postgresql@17"
+brew "openjdk"           # runs jdtls (needs Java 25+), keg-only
 
 # Apps (skip if installed by hand already)
 cask "kitty"
