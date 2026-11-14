@@ -1,7 +1,13 @@
-alias ls='eza --group-directories-first --icons=auto'
-alias ll='eza -l --git --group-directories-first --icons=auto'
-alias la='eza -la --git --group-directories-first --icons=auto'
-alias lt='eza --tree --level=2 --icons=auto'
+# Nerd Font icons only where the terminal has the font (kitty, also inside tmux);
+# terminals like the Claude desktop panel or VS Code would show empty boxes.
+case "$TERM_PROGRAM" in
+  claude-desktop|vscode|Apple_Terminal) export EZA_ICONS=never ;;
+  *)                                    export EZA_ICONS=auto ;;
+esac
+alias ls='eza --group-directories-first --icons=$EZA_ICONS'
+alias ll='eza -l --git --group-directories-first --icons=$EZA_ICONS'
+alias la='eza -la --git --group-directories-first --icons=$EZA_ICONS'
+alias lt='eza --tree --level=2 --icons=$EZA_ICONS'
 alias cat='bat --paging=never --style=plain'
 alias v='nvim'
 alias lg='lazygit'

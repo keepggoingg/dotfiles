@@ -21,7 +21,7 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' menu no
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':fzf-tab:*' switch-group '<' '>'
-zstyle ':fzf-tab:complete:(cd|z|__zoxide_z):*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
+zstyle ':fzf-tab:complete:(cd|z|__zoxide_z):*' fzf-preview 'eza -1 --color=always --icons=${EZA_ICONS/auto/always} $realpath'
 
 # ---- Plugins (antidote; `antidote update` to upgrade, never automatic) --------
 source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
