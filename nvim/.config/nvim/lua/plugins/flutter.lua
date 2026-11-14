@@ -41,4 +41,15 @@ return {
       { "<leader>Ft", "<cmd>FlutterDevTools<cr>", desc = "DevTools", ft = "dart" },
     },
   },
+  -- Dart tests via neotest: run through FVM so they use the project's Flutter
+  -- (.fvmrc), falling back to the global version outside FVM projects.
+  {
+    "nvim-neotest/neotest",
+    optional = true,
+    opts = {
+      adapters = {
+        ["neotest-dart"] = { command = "fvm flutter", use_lsp = true },
+      },
+    },
+  },
 }
