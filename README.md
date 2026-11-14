@@ -27,7 +27,8 @@ Each top-level folder is a stow package mirroring `$HOME`:
 | starship | `.config/starship.toml`                                   |
 | git      | `.gitconfig`, `.config/git/ignore`                        |
 | direnv   | `.config/direnv/direnv.toml`                              |
-| bin      | `.local/bin/` scripts (`tmux-sessionizer`)                |
+| bin      | `.local/bin/` scripts (`tmux-sessionizer`, `ssh-hosts-from-pass`) |
+| ssh      | `.ssh/config` defaults; hosts go in `~/.ssh/config.d/`    |
 
 Add a package: create `<pkg>/<path as in $HOME>`, then
 `stow --target ~ <pkg>` from the repo root.
@@ -82,3 +83,16 @@ LazyVim with extras for Java, Dart, SQL, YAML, Python, Docker, plus debugger
 | `Space oo`, `Space ow` | run a task (mvnw, npm, make...), task list |
 | `Space D` | database UI (dadbod) |
 | `Space gg` | lazygit |
+
+## SSH notes
+
+Targets live in pass: any entry with `/ssh/` in its path, first line = ssh
+arguments (`user@host`, optionally `-p`, `-i`, `-J`).
+
+- `s` picks one with fzf and connects; `s fit`, `s ald/prod` match the end of
+  the path; extra args go to ssh (`s fit uptime`). Tab completes entries.
+- `ssh-hosts-from-pass` writes `~/.ssh/config.d/pass-hosts` (not in the repo), so
+  plain `ssh fit`, `scp file fit:`, `rsync` and `nvim scp://fit//etc/hosts` work.
+  Re-run after adding entries.
+- Connections are shared per host for 10 minutes (`~/.ssh/cm`): a second tab or
+  scp connects instantly. After a VPN switch, `ssh -O exit <host>` drops a stale one.

@@ -48,6 +48,7 @@ sdk() { unfunction sdk; source "$SDKMAN_DIR/bin/sdkman-init.sh"; sdk "$@"; }
 [[ -f "$HOME/.dart-cli-completion/zsh-config.zsh" ]] && source "$HOME/.dart-cli-completion/zsh-config.zsh"
 
 source "$HOME/.config/zsh/aliases.zsh"
+source "$HOME/.config/zsh/ssh.zsh"
 
 # ---- Arrow keys: Normal (^[[A) and Application (^[OA) modes -------------------
 # Prefix history search on Up/Down in both forms, and leave Application Keypad
