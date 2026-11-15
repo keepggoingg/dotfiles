@@ -38,6 +38,7 @@ brew "minikube"
 brew "crane"
 brew "postgresql@17"
 brew "openjdk"           # runs jdtls (needs Java 25+), keg-only
+brew "go"                # builds the gitlab.nvim server
 
 # Apps (skip if installed by hand already)
 cask "kitty"

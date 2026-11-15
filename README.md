@@ -68,6 +68,9 @@ LazyVim with extras for Java, Dart, SQL, YAML, Python, Docker, plus debugger
   server. jdtls itself runs on Homebrew `openjdk` (needs 25+); projects compile
   with the SDKMAN JDKs listed in `lua/plugins/java.lua`.
 - Flutter: flutter-tools with the project's FVM SDK (`.fvm/flutter_sdk`).
+- GitLab MRs: gitlab.nvim reads the token from `glab` for the origin host
+  (`glab auth login --hostname <host>` once). Its own `gl...` keys work too
+  (`g?` in its windows lists them).
 
 | keys | action |
 |------|--------|
@@ -83,6 +86,12 @@ LazyVim with extras for Java, Dart, SQL, YAML, Python, Docker, plus debugger
 | `Space oo`, `Space ow` | run a task (mvnw, npm, make...), task list |
 | `Space D` | database UI (dadbod) |
 | `Space gg` | lazygit |
+| `Space gv` / `Space gV` | diff branch vs `origin/development` (diffview) / close |
+| `Space gH` | file history (diffview) |
+| `Space mm` | pick a GitLab MR (checks out its branch) |
+| `Space mr` / `ms` / `md` | review diff / MR description / discussions |
+| `Space mc` (visual: lines) / `mS` | comment on line / suggest a change |
+| `Space mA` / `mp` / `mo` | approve / pipeline / open in browser |
 
 ## SSH notes
 
