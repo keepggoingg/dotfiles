@@ -1,0 +1,43 @@
+#!/bin/zsh
+# Open a file or folder from Finder ("Open With > kitty") in a new tmux window:
+# images are shown with `kitten icat`, executables and .sh/.command scripts are
+# run (the window stays until a key is pressed), everything else opens in nvim.
+# Called by kitty/launch-actions.conf with the file path.
+# Uses the tmux session you were last in; with no attached tmux client it
+# opens a kitty window attached to that session.
+export PATH="/opt/homebrew/bin:$HOME/.local/bin:/usr/bin:/bin:$PATH"
+target=${1:?usage: kitty-open <file|dir>}
+
+if [[ -d $target ]]; then
+  dir=$target; cmd=(nvim .); name=${target:t}
+elif [[ ${target:e:l} == (png|jpg|jpeg|gif|webp|bmp|tiff|tif) ]]; then
+  dir=${target:h}; name=${target:t}
+  # Fit the image into the pane (tmux can't report pixel sizes, so place it by
+  # cells), then wait for any key; icat's own --hold doesn't see keys in tmux.
+  cmd=(zsh -c 'kitten icat --stdin=no --scale-up --place "${COLUMNS}x$((LINES - 1))@0x0" -- "$1"; read -rsk1' _ "$target")
+elif [[ -x $target || ${target:e:l} == (sh|command|tool) ]]; then
+  dir=${target:h}; name=${target:t}
+  cmd=(zsh -lc 'if [[ -x $1 ]]; then "$1"; else zsh "$1"; fi
+    print -P "\n%F{8}[exited with $?] press any key to close%f"; read -rsk1' _ "$target")
+else
+  dir=${target:h}; cmd=(nvim -- "$target"); name=${target:t}
+fi
+# nvim starts in the git root when the file is in a repo, so LSP and pickers see the project.
+[[ $cmd[1] == nvim ]] && root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) && dir=$root
+
+# Most recently active attached session, else the most recently used one.
+session=$(tmux list-clients -F '#{client_activity} #{client_session}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+attached=${session:+yes}
+[[ -z $session ]] && session=$(tmux list-sessions -F '#{session_activity} #{session_name}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+if [[ -z $session ]]; then
+  session=main
+  tmux new-session -d -s "$session" -c "$HOME"
+fi
+
+tmux new-window -t "$session:" -n "$name" -c "$dir" "${cmd[@]}"
+
+if [[ -n $attached ]]; then
+  open -a kitty   # bring the kitty window with that session to the front
+else
+  kitten @ launch --type=os-window zsh --login -c "exec tmux attach -t '$session'" >/dev/null
+fi
