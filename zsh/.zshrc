@@ -21,7 +21,7 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' menu no
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':fzf-tab:*' switch-group '<' '>'
-zstyle ':fzf-tab:complete:(cd|z|__zoxide_z):*' fzf-preview 'eza -1 --color=always --icons=${EZA_ICONS/auto/always} $realpath'
+zstyle ':fzf-tab:complete:(cd|__zoxide_z):*' fzf-preview 'eza -1 --color=always --icons=${EZA_ICONS/auto/always} $realpath'
 
 # ---- Plugins (antidote; `antidote update` to upgrade, never automatic) --------
 source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
@@ -36,6 +36,30 @@ export FZF_DEFAULT_OPTS='--height 40% --layout reverse --border'
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range :300 {}'"
 source <(fzf --zsh)            # Ctrl-R history, Ctrl-T files, Alt-C dirs
 eval "$(zoxide init zsh)"      # z <dir>, zi = interactive
+# `z foo<Tab>` offers zoxide's remembered folders (best score first, in fzf-tab with
+# the eza preview) instead of only subfolders of $PWD. Paths (/ . ~) complete like cd;
+# `z foo bar<Space><Tab>` keeps zoxide's own interactive picker.
+_z_db_complete() {
+  if (( CURRENT == 2 )) && [[ -n ${words[2]} && ${words[2]} != [./~]* ]]; then
+    local -a dirs=("${(@f)$(zoxide query -l --exclude "$PWD" -- "${words[2]}" 2>/dev/null)}")
+    dirs=(${dirs:#})
+    if (( $#dirs )); then
+      compadd -U -V zoxide -- "${dirs[@]}"
+      # -U makes zsh's "unambiguous" prefix garbage; go straight to the list.
+      compstate[insert]=menu
+      return
+    fi
+  fi
+  __zoxide_z_complete "$@"
+}
+compdef _z_db_complete z
+# Keep zoxide's score order, and seed fzf's query with what was typed.
+zstyle ':completion:*:z:*' sort false
+zstyle ':fzf-tab:complete:z:*' fzf-flags --no-sort
+zstyle ':fzf-tab:complete:z:*' query-string input
+# zoxide candidates are absolute, fzf-tab's $realpath would prepend $PWD to them.
+zstyle ':fzf-tab:complete:z:*' fzf-preview \
+  'p=$word; [[ $p == /* ]] || p=$realpath; eza -1 --color=always --icons=${EZA_ICONS/auto/always} $p'
 eval "$(direnv hook zsh)"
 
 export BAT_THEME=ansi          # follows the kitty palette
