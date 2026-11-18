@@ -1,51 +1,122 @@
-# dotfiles (macOS)
+<h1 align="center">dotfiles</h1>
 
-kitty + zsh + tmux + Neovim, linked into `$HOME` with GNU stow. The old Arch/sway
-setup lives on the `arch` branch.
+<p align="center">
+  A keyboard-only macOS dev setup for Flutter and Spring Boot:<br/>
+  <b>kitty</b> → <b>zsh</b> → <b>tmux</b> → <b>Neovim</b>, linked into <code>$HOME</code> with GNU stow.
+</p>
 
-## Install on a new Mac
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS" />
+  <img src="https://img.shields.io/badge/Neovim_0.12-57A143?style=for-the-badge&logo=neovim&logoColor=white" alt="Neovim" />
+  <img src="https://img.shields.io/badge/LazyVim-2E7DE9?style=for-the-badge&logo=lua&logoColor=white" alt="LazyVim" />
+  <img src="https://img.shields.io/badge/tmux-1BB91F?style=for-the-badge&logo=tmux&logoColor=white" alt="tmux" />
+  <img src="https://img.shields.io/badge/kitty-784421?style=for-the-badge&logo=gnometerminal&logoColor=white" alt="kitty" />
+  <img src="https://img.shields.io/badge/zsh-F15A24?style=for-the-badge&logo=zsh&logoColor=white" alt="zsh" />
+  <img src="https://img.shields.io/badge/Tokyo_Night-1a1b26?style=for-the-badge&logoColor=7aa2f7" alt="Tokyo Night" />
+</p>
+
+<p align="center">
+  <img src=".github/assets/nvim.png" alt="Neovim with the file explorer and a LazyVim plugin spec" width="100%" />
+</p>
+
+## ✨ What's inside
+
+- **Neovim as the IDE.** LazyVim on Neovim 0.12 with LSP, debugger, test runner and
+  task runner for the two stacks I work in:
+  - **Java / Spring Boot**: jdtls with Lombok, java-debug, java-test and the Spring Boot
+    language server (bean and property navigation in `application.yml`).
+  - **Flutter**: flutter-tools with the project's FVM SDK, hot reload, device picker,
+    widget outline, tests through `fvm flutter test`.
+  - **Code review in the editor**: diffview for branch-vs-target diffs and gitlab.nvim
+    for merge requests: discussions, line comments, suggestions, approve, pipeline.
+  - **AI**: Claude Code next to the code (`claudecode.nvim`).
+- **tmux as the window manager.** One session per project picked with fzf, panes that
+  share `Ctrl-h/j/k/l` with Neovim splits, sessions saved and restored across reboots,
+  lazygit in a popup. New kitty windows land back in the last session.
+- **zsh that starts in ~0.1 s.** antidote instead of oh-my-zsh, fzf-tab completion,
+  autosuggestions, syntax highlighting, zoxide, eza, bat, starship, lazy-loaded SDKMAN.
+- **kitty with no tabs of its own.** JetBrains Mono Nerd Font, Option as Alt, Tokyo Night,
+  a little blur. Finder's **Open With → kitty** opens files in Neovim inside tmux,
+  shows images inline and runs scripts.
+- **SSH from the password store.** `s` fuzzy-picks a host from `pass`, and
+  `ssh-hosts-from-pass` turns the same entries into `~/.ssh/config` hosts.
+  No hostnames or keys in this repo.
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src=".github/assets/whichkey.png" alt="which-key menu over a Java config file" /></td>
+    <td width="50%"><img src=".github/assets/lazygit.png" alt="lazygit with unstaged changes" /></td>
+  </tr>
+  <tr>
+    <td align="center"><code>Space</code> and a pause: every key in which-key</td>
+    <td align="center">lazygit in a tmux popup (<code>prefix g</code>)</td>
+  </tr>
+</table>
+
+## 🚀 Install on a new Mac
 
 ```bash
-git clone git@github.com:endo000/dotfiles.git ~/dev/personal/dotfiles
+git clone https://github.com/keepggoingg/dotfiles.git ~/dev/personal/dotfiles
 ~/dev/personal/dotfiles/install.sh
 ```
 
-`install.sh` runs `brew bundle`, installs SDKMAN, TPM and tmux plugins, moves any
+`install.sh` runs `brew bundle`, installs SDKMAN, TPM and the tmux plugins, moves any
 conflicting files to `~/.dotfiles-backup/<date>/` and stows every package.
+Then put your git name and email in `~/.gitconfig.local`:
 
-## Layout
+```ini
+[user]
+	name = Your Name
+	email = you@example.com
+```
+
+## 🗂 Layout
 
 Each top-level folder is a stow package mirroring `$HOME`:
 
-| package  | what                                                      |
-|----------|-----------------------------------------------------------|
-| zsh      | `.zshenv`, `.zprofile` (PATH), `.zshrc`, `.config/zsh/`   |
-| kitty    | `.config/kitty/kitty.conf`                                |
-| tmux     | `.config/tmux/tmux.conf` (own config, TPM plugins)        |
-| nvim     | `.config/nvim` (LazyVim)                                  |
-| ideavim  | `.ideavimrc`                                              |
-| starship | `.config/starship.toml`                                   |
-| git      | `.gitconfig`, `.config/git/ignore`                        |
-| direnv   | `.config/direnv/direnv.toml`                              |
-| bin      | `.local/bin/` scripts (`tmux-sessionizer`, `ssh-hosts-from-pass`) |
-| ssh      | `.ssh/config` defaults; hosts go in `~/.ssh/config.d/`    |
+| package  | what |
+|----------|------|
+| `zsh`      | `.zshenv`, `.zprofile` (PATH), `.zshrc`, `.config/zsh/` |
+| `kitty`    | `.config/kitty/kitty.conf`, Finder "Open With" handler |
+| `tmux`     | `.config/tmux/tmux.conf` (own config, TPM plugins) |
+| `nvim`     | `.config/nvim` (LazyVim) |
+| `ideavim`  | `.ideavimrc` |
+| `starship` | `.config/starship.toml` |
+| `git`      | `.gitconfig` (identity in `~/.gitconfig.local`), `.config/git/ignore` |
+| `direnv`   | `.config/direnv/direnv.toml` |
+| `bin`      | `.local/bin/`: `tmux-sessionizer`, `tmux-attach-last`, `kitty-open`, `ssh-hosts-from-pass` |
+| `ssh`      | `.ssh/config` defaults; hosts go in `~/.ssh/config.d/` |
 
-Add a package: create `<pkg>/<path as in $HOME>`, then
+Add a package: create `<pkg>/<path as in $HOME>`, then run
 `stow --target ~ <pkg>` from the repo root.
 
-## zsh notes
+## ⌨️ Keys
 
-- Plugins: antidote, list in `zsh/.config/zsh/plugins.txt`. Updates only on
-  `antidote update`.
-- SDKMAN is not sourced at startup; its `current` Java/Maven are on PATH and
-  `sdk` loads it on first use.
+<details>
+<summary><b>zsh</b></summary>
+
+- Plugins: antidote, list in `zsh/.config/zsh/plugins.txt`. Updates only on `antidote update`.
+- SDKMAN is not sourced at startup; its `current` Java/Maven are on PATH and `sdk`
+  loads it on first use.
 - Machine-only settings and secrets go in `~/.zshrc.local` (not in the repo).
-- Keys: `Ctrl-R` history, `Ctrl-T` files, `Alt-C` dirs (fzf), `Ctrl-Y` accept
-  suggestion, `z`/`zi` jump (zoxide).
 
-## tmux notes
+| keys | action |
+|------|--------|
+| `Ctrl-R` / `Ctrl-T` / `Alt-C` | history / files / dirs (fzf) |
+| `Ctrl-Y` | accept suggestion |
+| `z` / `zi` | jump to a folder (zoxide) |
+| `t` | pick a project, open its tmux session |
+| `s` | pick an SSH host from pass |
 
-Prefix is `Ctrl-Space`. `prefix r` reloads, `prefix I` installs plugins.
+</details>
+
+<details>
+<summary><b>tmux</b> (prefix <code>Ctrl-Space</code>)</summary>
+
+`prefix r` reloads, `prefix I` installs plugins. A new kitty window attaches to the
+last-used session (`tmux-attach-last`); only a cold start creates one.
 
 | keys | action |
 |------|--------|
@@ -58,16 +129,17 @@ Prefix is `Ctrl-Space`. `prefix r` reloads, `prefix I` installs plugins.
 | `prefix Enter`, `v`, `y` | copy mode, select, copy to macOS clipboard |
 | `prefix C-s` / `C-r` | save / restore sessions (also autosaved every 15 min) |
 
-## Neovim notes
+</details>
 
-LazyVim with extras for Java, Dart, SQL, YAML, Python, Docker, plus debugger
-(nvim-dap), tests (neotest) and tasks (overseer). Leader is `Space`;
-`Space` and a pause shows every key in which-key.
+<details>
+<summary><b>Neovim</b> (leader <code>Space</code>)</summary>
 
-- Java: jdtls (+ Lombok, java-debug, java-test) and the Spring Boot language
-  server. jdtls itself runs on Homebrew `openjdk` (needs 25+); projects compile
-  with the SDKMAN JDKs listed in `lua/plugins/java.lua`.
-- Flutter: flutter-tools with the project's FVM SDK (`.fvm/flutter_sdk`).
+LazyVim with extras for Java, Dart, SQL, YAML, Python, Docker, TypeScript, plus
+debugger (nvim-dap), tests (neotest) and tasks (overseer).
+
+- Java: jdtls itself runs on Homebrew `openjdk` (needs 25+); projects compile with the
+  SDKMAN JDKs listed in `lua/plugins/java.lua`.
+- Flutter: flutter-tools uses the project's FVM SDK (`.fvm/flutter_sdk`).
 - GitLab MRs: gitlab.nvim reads the token from `glab` for the origin host
   (`glab auth login --hostname <host>` once). Its own `gl...` keys work too
   (`g?` in its windows lists them).
@@ -93,15 +165,24 @@ LazyVim with extras for Java, Dart, SQL, YAML, Python, Docker, plus debugger
 | `Space mc` (visual: lines) / `mS` | comment on line / suggest a change |
 | `Space mA` / `mp` / `mo` | approve / pipeline / open in browser |
 
-## SSH notes
+</details>
 
-Targets live in pass: any entry with `/ssh/` in its path, first line = ssh
-arguments (`user@host`, optionally `-p`, `-i`, `-J`).
+<details>
+<summary><b>SSH</b></summary>
 
-- `s` picks one with fzf and connects; `s fit`, `s ald/prod` match the end of
-  the path; extra args go to ssh (`s fit uptime`). Tab completes entries.
-- `ssh-hosts-from-pass` writes `~/.ssh/config.d/pass-hosts` (not in the repo), so
-  plain `ssh fit`, `scp file fit:`, `rsync` and `nvim scp://fit//etc/hosts` work.
+Hosts live in [pass](https://www.passwordstore.org/): any entry with `/ssh/` in its path,
+first line = ssh arguments (`user@host`, optionally `-p`, `-i`, `-J`).
+
+- `s` picks one with fzf and connects; `s web1`, `s acme/prod` match the end of the
+  path; extra args go to ssh (`s web1 uptime`). Tab completes entries.
+- `ssh-hosts-from-pass` writes `~/.ssh/config.d/pass-hosts` (not in the repo), so plain
+  `ssh web1`, `scp file web1:`, `rsync` and `nvim scp://web1//etc/hosts` work.
   Re-run after adding entries.
-- Connections are shared per host for 10 minutes (`~/.ssh/cm`): a second tab or
-  scp connects instantly. After a VPN switch, `ssh -O exit <host>` drops a stale one.
+- Connections are shared per host for 10 minutes (`~/.ssh/cm`): a second tab or scp
+  connects instantly. After a VPN switch, `ssh -O exit <host>` drops a stale one.
+
+</details>
+
+## 📄 License
+
+[MIT](LICENSE)

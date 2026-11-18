@@ -1,8 +1,8 @@
 #!/usr/bin/env zsh
 # Write ~/.ssh/config.d/pass-hosts with one Host per pass entry under */ssh/*,
-# so `ssh fit`, `scp x fit:`, `rsync`, git and nvim's scp:// work by name.
+# so `ssh web1`, `scp x web1:`, `rsync`, git and nvim's scp:// work by name.
 # The alias is the last path part; when two entries share it, the parent is
-# prefixed (eearly-acceptance, latest-acceptance). Run again after changing pass.
+# prefixed (acme-staging, blog-staging). Run again after changing pass.
 emulate -L zsh
 setopt err_return pipe_fail
 store=${PASSWORD_STORE_DIR:-$HOME/.password-store}
