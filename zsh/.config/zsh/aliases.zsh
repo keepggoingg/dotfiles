@@ -28,3 +28,6 @@ x() {
   esac
 }
 alias t='tmux-sessionizer'
+
+# Claude Code on the personal account (own login, memory, settings); plain `claude` stays on work.
+alias claude-personal='CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude'
