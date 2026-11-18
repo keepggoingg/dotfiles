@@ -1,0 +1,15 @@
+#!/bin/zsh
+# Entry point for new kitty windows (kitty.conf `shell`): attach to the tmux
+# session you were last in instead of starting a new one. Picks the session
+# like kitty-open: most recently active attached client, else the most
+# recently used session.
+# With no tmux server (or no sessions) it runs plain `tmux`, which creates
+# session "0"; tmux-resurrect (continuum restore) replaces or kills exactly
+# that session, so a cold start doesn't leave a stray empty session.
+session=$(tmux list-clients -F '#{client_activity} #{client_session}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+[[ -z $session ]] && session=$(tmux list-sessions -F '#{session_activity} #{session_name}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+if [[ -n $session ]]; then
+  # "=" makes the target an exact session name, not a prefix match.
+  exec tmux attach-session -t "=$session"
+fi
+exec tmux
