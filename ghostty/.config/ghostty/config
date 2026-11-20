@@ -14,14 +14,13 @@ window-padding-balance = true
 window-save-state = always
 confirm-close-surface = false
 quit-after-last-window-closed = true
-macos-titlebar-style = hidden
+macos-titlebar-style = transparent
 macos-option-as-alt = true
 background-opacity = 0.88
 background-blur = 30
-background-image = wallpapers/night.png
-background-image-fit = cover
-background-image-opacity = 0.55
 mouse-hide-while-typing = true
+# no "..." split grabber at the top of the window
+drag-handle = never
 
 # Cursor
 cursor-style = block
@@ -29,7 +28,6 @@ cursor-style-blink = false
 shell-integration-features = no-cursor
 
 # Shaders (applied in order). Comment out a line to compare.
-custom-shader = shaders/bloom.glsl
 custom-shader = shaders/cursor_smear.glsl
 custom-shader-animation = true
 

@@ -1,4 +1,4 @@
-# Login shells (kitty and tmux start these). PATH lives here because macOS
+# Login shells (Ghostty, kitty and tmux start these). PATH lives here because macOS
 # /etc/zprofile reorders PATH after .zshenv.
 eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 eval "$(rbenv init - --no-rehash zsh)"
@@ -16,6 +16,7 @@ path=(
   $HOME/.pub-cache/bin
   $HOME/Library/Android/sdk/platform-tools
   $BUN_INSTALL/bin
+  /Applications/Ghostty.app/Contents/MacOS # ghostty CLI (+show-config, +validate-config)
   /Applications/kitty.app/Contents/MacOS   # kitty, kitten
   $path
 )

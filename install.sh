@@ -39,4 +39,5 @@ stow --dir "$DOTFILES" --target "$HOME" --restow "${PACKAGES[@]}"
 
 [[ -f "$HOME/.z" ]] && command -v zoxide >/dev/null && zoxide import z --merge || true
 "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" || true
+"$DOTFILES/macos/build-open-in-neovim.sh" || echo "Open in Neovim.app build failed; continuing"
 echo "Done. Open a new terminal."

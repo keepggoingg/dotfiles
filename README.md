@@ -2,7 +2,7 @@
 
 <p align="center">
   A keyboard-only macOS dev setup for Flutter and Spring Boot:<br/>
-  <b>kitty</b> → <b>zsh</b> → <b>tmux</b> → <b>Neovim</b>, linked into <code>$HOME</code> with GNU stow.
+  <b>Ghostty</b> → <b>zsh</b> → <b>tmux</b> → <b>Neovim</b>, linked into <code>$HOME</code> with GNU stow.
 </p>
 
 <p align="center">
@@ -10,9 +10,13 @@
   <img src="https://img.shields.io/badge/Neovim_0.12-57A143?style=for-the-badge&logo=neovim&logoColor=white" alt="Neovim" />
   <img src="https://img.shields.io/badge/LazyVim-2E7DE9?style=for-the-badge&logo=lua&logoColor=white" alt="LazyVim" />
   <img src="https://img.shields.io/badge/tmux-1BB91F?style=for-the-badge&logo=tmux&logoColor=white" alt="tmux" />
-  <img src="https://img.shields.io/badge/kitty-784421?style=for-the-badge&logo=gnometerminal&logoColor=white" alt="kitty" />
+  <img src="https://img.shields.io/badge/Ghostty-3551F3?style=for-the-badge&logo=ghostty&logoColor=white" alt="Ghostty" />
   <img src="https://img.shields.io/badge/zsh-F15A24?style=for-the-badge&logo=zsh&logoColor=white" alt="zsh" />
   <img src="https://img.shields.io/badge/Tokyo_Night-1a1b26?style=for-the-badge&logoColor=7aa2f7" alt="Tokyo Night" />
+</p>
+
+<p align="center">
+  <img src=".github/assets/ghostty.png" alt="Ghostty with tmux: Neovim, fastfetch and btop" width="100%" />
 </p>
 
 <p align="center">
@@ -32,12 +36,15 @@
   - **AI**: Claude Code next to the code (`claudecode.nvim`).
 - **tmux as the window manager.** One session per project picked with fzf, panes that
   share `Ctrl-h/j/k/l` with Neovim splits, sessions saved and restored across reboots,
-  lazygit in a popup. New kitty windows land back in the last session.
+  lazygit in a popup. New terminal windows land back in the last session.
 - **zsh that starts in ~0.1 s.** antidote instead of oh-my-zsh, fzf-tab completion,
   autosuggestions, syntax highlighting, zoxide, eza, bat, starship, lazy-loaded SDKMAN.
-- **kitty with no tabs of its own.** JetBrains Mono Nerd Font, Option as Alt, Tokyo Night,
-  a little blur. Finder's **Open With → kitty** opens files in Neovim inside tmux,
-  shows images inline and runs scripts.
+- **Ghostty with no tabs of its own.** JetBrains Mono Nerd Font, Option as Alt, Tokyo Night,
+  blur, a cursor-smear GLSL shader,
+  a pill-style tmux bar and a fastfetch config for screenshots.
+- **Finder → Neovim.** **Open With → Open in Neovim** (a small AppleScript droplet built
+  by `install.sh`) opens files in Neovim inside tmux, shows images inline (chafa) and
+  runs scripts. kitty's config stays as a fallback and uses the same handler.
 - **SSH from the password store.** `s` fuzzy-picks a host from `pass`, and
   `ssh-hosts-from-pass` turns the same entries into `~/.ssh/config` hosts.
   No hostnames or keys in this repo.
@@ -63,7 +70,8 @@ git clone https://github.com/keepggoingg/dotfiles.git ~/dev/personal/dotfiles
 ```
 
 `install.sh` runs `brew bundle`, installs SDKMAN, TPM and the tmux plugins, moves any
-conflicting files to `~/.dotfiles-backup/<date>/` and stows every package.
+conflicting files to `~/.dotfiles-backup/<date>/`, stows every package and builds
+`Open in Neovim.app`.
 Then put your git name and email in `~/.gitconfig.local`:
 
 ```ini
@@ -79,15 +87,20 @@ Each top-level folder is a stow package mirroring `$HOME`:
 | package  | what |
 |----------|------|
 | `zsh`      | `.zshenv`, `.zprofile` (PATH), `.zshrc`, `.config/zsh/` |
-| `kitty`    | `.config/kitty/kitty.conf`, Finder "Open With" handler |
+| `ghostty`  | `.config/ghostty/` config, cursor-smear shader |
+| `fastfetch`| `.config/fastfetch/config.jsonc` |
+| `kitty`    | `.config/kitty/` fallback terminal config |
 | `tmux`     | `.config/tmux/tmux.conf` (own config, TPM plugins) |
 | `nvim`     | `.config/nvim` (LazyVim) |
 | `ideavim`  | `.ideavimrc` |
 | `starship` | `.config/starship.toml` |
 | `git`      | `.gitconfig` (identity in `~/.gitconfig.local`), `.config/git/ignore` |
 | `direnv`   | `.config/direnv/direnv.toml` |
-| `bin`      | `.local/bin/`: `tmux-sessionizer`, `tmux-attach-last`, `kitty-open`, `ssh-hosts-from-pass` |
+| `bin`      | `.local/bin/`: `tmux-sessionizer`, `tmux-attach-last`, `term-open`, `ssh-hosts-from-pass` |
 | `ssh`      | `.ssh/config` defaults; hosts go in `~/.ssh/config.d/` |
+
+`macos/` is not a stow package: `build-open-in-neovim.sh` compiles the Finder droplet
+into `~/Applications`.
 
 Add a package: create `<pkg>/<path as in $HOME>`, then run
 `stow --target ~ <pkg>` from the repo root.
@@ -115,7 +128,7 @@ Add a package: create `<pkg>/<path as in $HOME>`, then run
 <details>
 <summary><b>tmux</b> (prefix <code>Ctrl-Space</code>)</summary>
 
-`prefix r` reloads, `prefix I` installs plugins. A new kitty window attaches to the
+`prefix r` reloads, `prefix I` installs plugins. A new Ghostty window attaches to the
 last-used session (`tmux-attach-last`); only a cold start creates one.
 
 | keys | action |
@@ -128,6 +141,7 @@ last-used session (`tmux-attach-last`); only a cold start creates one.
 | `prefix g` | lazygit popup |
 | `prefix Enter`, `v`, `y` | copy mode, select, copy to macOS clipboard |
 | `prefix C-s` / `C-r` | save / restore sessions (also autosaved every 15 min) |
+| right-click / `Shift`+right-click | tmux menu (copy, paste, split, zoom, lazygit, projects, close) / Ghostty's own menu |
 
 </details>
 

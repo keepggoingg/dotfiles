@@ -1,7 +1,7 @@
 #!/bin/zsh
-# Entry point for new kitty windows (kitty.conf `shell`): attach to the tmux
+# Entry point for new terminal windows (Ghostty `command`, kitty `shell`): attach to the tmux
 # session you were last in instead of starting a new one. Picks the session
-# like kitty-open: most recently active attached client, else the most
+# like term-open: most recently active attached client, else the most
 # recently used session.
 # With no tmux server (or no sessions) it runs plain `tmux`, which creates
 # session "0"; tmux-resurrect (continuum restore) replaces or kills exactly

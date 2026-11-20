@@ -1,4 +1,4 @@
-# Nerd Font icons only where the terminal has the font (kitty, also inside tmux);
+# Nerd Font icons only where the terminal has the font (Ghostty/kitty, also inside tmux);
 # terminals like the Claude desktop panel or VS Code would show empty boxes.
 case "$TERM_PROGRAM" in
   claude-desktop|vscode|Apple_Terminal) export EZA_ICONS=never ;;

@@ -62,7 +62,7 @@ zstyle ':fzf-tab:complete:z:*' fzf-preview \
   'p=$word; [[ $p == /* ]] || p=$realpath; eza -1 --color=always --icons=${EZA_ICONS/auto/always} $p'
 eval "$(direnv hook zsh)"
 
-export BAT_THEME=ansi          # follows the kitty palette
+export BAT_THEME=ansi          # follows the terminal palette
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # SDKMAN is heavy; load it only when `sdk` is called.
