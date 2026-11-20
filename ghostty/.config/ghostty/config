@@ -1,0 +1,77 @@
+# Ghostty: ported from kitty.conf (Tokyo Night, JetBrains Mono, tmux auto-attach)
+
+command = /bin/zsh --login -c "exec $HOME/.local/bin/tmux-attach-last"
+
+# Font
+font-family = JetBrainsMono Nerd Font
+font-size = 14
+adjust-cell-height = 10%
+
+# Window
+window-padding-x = 24
+window-padding-y = 18
+window-padding-balance = true
+window-save-state = always
+confirm-close-surface = false
+quit-after-last-window-closed = true
+macos-titlebar-style = hidden
+macos-option-as-alt = true
+background-opacity = 0.88
+background-blur = 30
+background-image = wallpapers/night.png
+background-image-fit = cover
+background-image-opacity = 0.55
+mouse-hide-while-typing = true
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = no-cursor
+
+# Shaders (applied in order). Comment out a line to compare.
+custom-shader = shaders/bloom.glsl
+custom-shader = shaders/cursor_smear.glsl
+custom-shader-animation = true
+
+# Tokyo Night (same values as kitty)
+foreground = #c0caf5
+background = #161621
+selection-background = #283457
+cursor-color = #c0caf5
+cursor-text = #1a1b26
+palette = 0=#1d202f
+palette = 1=#f7768e
+palette = 2=#9ece6a
+palette = 3=#e0af68
+palette = 4=#7aa2f7
+palette = 5=#bb9af7
+palette = 6=#7dcfff
+palette = 7=#a9b1d6
+palette = 8=#414868
+palette = 9=#f88b9f
+palette = 10=#afd784
+palette = 11=#e3b878
+palette = 12=#8baef8
+palette = 13=#ccb4f9
+palette = 14=#99daff
+palette = 15=#c0caf5
+
+# tmux owns tabs/splits: free these keys like in kitty
+keybind = super+t=unbind
+keybind = super+w=unbind
+keybind = super+d=unbind
+keybind = super+shift+d=unbind
+keybind = super+enter=unbind
+keybind = ctrl+tab=unbind
+keybind = ctrl+shift+tab=unbind
+keybind = super+shift+bracket_left=unbind
+keybind = super+shift+bracket_right=unbind
+keybind = super+one=unbind
+keybind = super+two=unbind
+keybind = super+three=unbind
+keybind = super+four=unbind
+keybind = super+five=unbind
+keybind = super+six=unbind
+keybind = super+seven=unbind
+keybind = super+eight=unbind
+keybind = super+nine=unbind

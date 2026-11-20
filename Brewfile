@@ -42,4 +42,6 @@ brew "go"                # builds the gitlab.nvim server
 
 # Apps (skip if installed by hand already)
 cask "kitty"
+cask "ghostty"
 cask "font-jetbrains-mono-nerd-font"
+brew "fastfetch"
