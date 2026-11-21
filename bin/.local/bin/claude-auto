@@ -1,0 +1,16 @@
+#!/bin/zsh
+# Start Claude Code with the profile that matches the current directory:
+#   ~/dev/personal/... -> personal config (~/.claude-personal)
+#   ~/dev/result/...   -> work config (default ~/.claude)
+# Anywhere else: $1 decides ("personal" or "work"), default work.
+case $PWD/ in
+  $HOME/dev/personal/*) profile=personal ;;
+  $HOME/dev/result/*)   profile=work ;;
+  *)                    profile=${1:-work} ;;
+esac
+if [[ $profile == personal ]]; then
+  export CLAUDE_CONFIG_DIR=$HOME/.claude-personal
+else
+  unset CLAUDE_CONFIG_DIR
+fi
+exec claude
