@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src=".github/assets/ghostty.png" alt="Ghostty with tmux: Neovim, fastfetch and btop" width="100%" />
+  <img src=".github/assets/ghostty.png" alt="Ghostty with tmux: Neovim, fastfetch and an eza tree of the configs" width="100%" />
 </p>
 
 <p align="center">
