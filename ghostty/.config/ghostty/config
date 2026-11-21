@@ -76,3 +76,15 @@ keybind = super+six=unbind
 keybind = super+seven=unbind
 keybind = super+eight=unbind
 keybind = super+nine=unbind
+
+# VS Code-style Cmd shortcuts for nvim, relayed by tmux (tmux.conf "Cmd keys for nvim")
+keybind = super+s=csi:9001;0~
+keybind = super+p=csi:9001;1~
+keybind = super+shift+p=csi:9001;2~
+keybind = super+shift+f=csi:9001;3~
+keybind = super+slash=csi:9001;4~
+keybind = super+z=csi:9001;5~
+keybind = super+shift+z=csi:9001;6~
+keybind = super+a=csi:9001;7~
+keybind = super+b=csi:9001;8~
+keybind = super+w=csi:9001;9~
