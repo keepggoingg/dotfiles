@@ -89,6 +89,7 @@ Each top-level folder is a stow package mirroring `$HOME`:
 | `zsh`      | `.zshenv`, `.zprofile` (PATH), `.zshrc`, `.config/zsh/` |
 | `ghostty`  | `.config/ghostty/` config, cursor-smear shader |
 | `fastfetch`| `.config/fastfetch/config.jsonc` |
+| `btop`     | `.config/btop/` config + `tokyo-night-term` theme |
 | `kitty`    | `.config/kitty/` fallback terminal config |
 | `tmux`     | `.config/tmux/tmux.conf` (own config, TPM plugins) |
 | `nvim`     | `.config/nvim` (LazyVim) |

@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 DOTFILES="$PWD"
-PACKAGES=(zsh kitty ghostty fastfetch tmux nvim ideavim starship git direnv bin ssh)
+PACKAGES=(zsh kitty ghostty fastfetch btop tmux nvim ideavim starship git direnv bin ssh)
 
 if ! command -v brew >/dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

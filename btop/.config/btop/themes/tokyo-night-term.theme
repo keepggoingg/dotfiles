@@ -1,0 +1,57 @@
+# btop theme matching the Ghostty/kitty Tokyo Night palette in this repo.
+# theme_background = false in btop.conf lets the terminal's translucent #161621 show through.
+
+theme[main_bg]="#161621"
+theme[main_fg]="#c0caf5"
+theme[title]="#c0caf5"
+theme[hi_fg]="#7aa2f7"
+theme[selected_bg]="#283457"
+theme[selected_fg]="#c0caf5"
+theme[inactive_fg]="#414868"
+theme[graph_text]="#a9b1d6"
+theme[meter_bg]="#1d202f"
+theme[proc_misc]="#7dcfff"
+
+# Box outlines
+theme[cpu_box]="#414868"
+theme[mem_box]="#414868"
+theme[net_box]="#414868"
+theme[proc_box]="#414868"
+theme[div_line]="#292e42"
+
+# Gradients: start, mid, end
+theme[temp_start]="#9ece6a"
+theme[temp_mid]="#e0af68"
+theme[temp_end]="#f7768e"
+
+theme[cpu_start]="#7dcfff"
+theme[cpu_mid]="#7aa2f7"
+theme[cpu_end]="#bb9af7"
+
+theme[free_start]="#9ece6a"
+theme[free_mid]="#9ece6a"
+theme[free_end]="#afd784"
+
+theme[cached_start]="#7dcfff"
+theme[cached_mid]="#7dcfff"
+theme[cached_end]="#99daff"
+
+theme[available_start]="#e0af68"
+theme[available_mid]="#e0af68"
+theme[available_end]="#e3b878"
+
+theme[used_start]="#f7768e"
+theme[used_mid]="#f7768e"
+theme[used_end]="#f88b9f"
+
+theme[download_start]="#7aa2f7"
+theme[download_mid]="#7dcfff"
+theme[download_end]="#99daff"
+
+theme[upload_start]="#bb9af7"
+theme[upload_mid]="#ccb4f9"
+theme[upload_end]="#f7768e"
+
+theme[process_start]="#7aa2f7"
+theme[process_mid]="#bb9af7"
+theme[process_end]="#f7768e"
