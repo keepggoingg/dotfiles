@@ -4,10 +4,10 @@ case "$TERM_PROGRAM" in
   claude-desktop|vscode|Apple_Terminal) export EZA_ICONS=never ;;
   *)                                    export EZA_ICONS=auto ;;
 esac
-alias ls='eza --group-directories-first --icons=$EZA_ICONS'
-alias ll='eza -l --git --group-directories-first --icons=$EZA_ICONS'
-alias la='eza -la --git --group-directories-first --icons=$EZA_ICONS'
-alias lt='eza --tree --level=2 --icons=$EZA_ICONS'
+alias ls='eza --hyperlink=auto --group-directories-first --icons=$EZA_ICONS'
+alias ll='eza --hyperlink=auto -l --git --group-directories-first --icons=$EZA_ICONS'
+alias la='eza --hyperlink=auto -la --git --group-directories-first --icons=$EZA_ICONS'
+alias lt='eza --hyperlink=auto --tree --level=2 --icons=$EZA_ICONS'
 alias cat='bat --paging=never --style=plain'
 alias v='nvim'
 alias lg='lazygit'
