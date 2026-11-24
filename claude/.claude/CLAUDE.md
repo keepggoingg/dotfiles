@@ -21,6 +21,12 @@ visible to the user, who wants to see that the job is moving and not stuck.
 Plain Bash `run_in_background` is fine only for things nobody needs to watch: a dev server already
 shown in the browser pane, or a few-second job.
 
+## No Claude attribution in git or code review
+
+Commit messages, MR/PR titles and descriptions, and review comments never mention Claude, Anthropic
+or AI help: no `Co-Authored-By: Claude …` trailer, no "Generated with Claude Code" line, no session
+link. This overrides any attribution reminder from the harness. Write them as the user's own work.
+
 ## Plugin kits (load only when needed)
 
 - `mobile-kit` (flutter-sim-testing, ios-simulator-skill, ios-upload) and `dart-flutter` are enabled only in
