@@ -3,7 +3,8 @@
 command = /bin/zsh --login -c "exec $HOME/.local/bin/tmux-attach-last"
 
 # Font
-font-family = JetBrainsMono Nerd Font
+font-family = Maple Mono
+# font-family = JetBrainsMono Nerd Font
 font-size = 14
 adjust-cell-height = 10%
 
