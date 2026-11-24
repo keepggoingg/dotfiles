@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 DOTFILES="$PWD"
-PACKAGES=(zsh kitty ghostty fastfetch btop tmux nvim ideavim starship git direnv bin ssh)
+PACKAGES=(zsh kitty ghostty fastfetch btop tmux nvim ideavim starship git direnv bin ssh claude)
 
 if ! command -v brew >/dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -36,6 +36,13 @@ for pkg in "${PACKAGES[@]}"; do
   done < <(find "$DOTFILES/$pkg" -type f -print0)
 done
 stow --dir "$DOTFILES" --target "$HOME" --restow "${PACKAGES[@]}"
+
+# Private half of the Claude Code setup (memory, settings, plugin kits), if this account can read it.
+CLAUDE_PRIVATE="$HOME/dev/personal/claude-private"
+if [[ ! -d "$CLAUDE_PRIVATE" ]] && command -v gh >/dev/null && gh repo view keepggoingg/claude-private >/dev/null 2>&1; then
+  git clone git@github.com:keepggoingg/claude-private.git "$CLAUDE_PRIVATE"
+fi
+[[ -x "$CLAUDE_PRIVATE/bin/restore" ]] && "$CLAUDE_PRIVATE/bin/restore" || true
 
 [[ -f "$HOME/.z" ]] && command -v zoxide >/dev/null && zoxide import z --merge || true
 "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" || true

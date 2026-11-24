@@ -1,0 +1,13 @@
+#!/bin/sh
+# Claude Code status line: shows which profile is running (work or personal), the model and the folder.
+# Used by both ~/.claude/settings.json and ~/.claude-personal/settings.json.
+input=$(cat)
+model=$(printf '%s' "$input" | jq -r '.model.display_name // empty')
+dir=$(printf '%s' "$input" | jq -r '.workspace.current_dir // .cwd // empty' | sed "s|^$HOME|~|")
+
+case "$CLAUDE_CONFIG_DIR" in
+  *claude-personal*) badge='\033[1;30;45m personal \033[0m' ;;   # magenta
+  *)                 badge='\033[1;30;46m work \033[0m' ;;       # cyan
+esac
+
+printf "$badge  %s  \033[2m%s\033[0m" "$model" "$dir"

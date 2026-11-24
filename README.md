@@ -48,6 +48,10 @@
 - **SSH from the password store.** `s` fuzzy-picks a host from `pass`, and
   `ssh-hosts-from-pass` turns the same entries into `~/.ssh/config` hosts.
   No hostnames or keys in this repo.
+- **Claude Code that loads only what a task needs.** Global rules in `~/.claude/CLAUDE.md`,
+  a status line showing the work/personal profile, and skills grouped into plugin kits that are
+  switched on per project (mobile skills only in Flutter repos, design skills on demand), so every
+  session starts with fewer tokens. Memory and settings live in a private companion repo.
 
 ## 📸 Screenshots
 
@@ -99,6 +103,7 @@ Each top-level folder is a stow package mirroring `$HOME`:
 | `direnv`   | `.config/direnv/direnv.toml` |
 | `bin`      | `.local/bin/`: `tmux-sessionizer`, `tmux-attach-last`, `term-open`, `ssh-hosts-from-pass` |
 | `ssh`      | `.ssh/config` defaults; hosts go in `~/.ssh/config.d/` |
+| `claude`   | `.claude/CLAUDE.md` (imports a private `CLAUDE.private.md`), `.local/bin/claude-statusline` |
 
 `macos/` is not a stow package: `build-open-in-neovim.sh` compiles the Finder droplet
 into `~/Applications`.
