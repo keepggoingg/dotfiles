@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Copy tmux key bindings onto the Russian (ЙЦУКЕН) layout, so prefix+ф works like prefix+a
+# without switching the keyboard. Run from tmux.conf after all bindings (and plugins) are set.
+# Usage: tmux-cyrillic-keys [table...]   (default: prefix copy-mode-vi)
+lat='qwertyuiopasdfghjklzxcvbnm[];,.QWERTYUIOPASDFGHJKLZXCVBNM{}:<>'
+cyr='йцукенгшщзфывапролдячсмитьхъжбюЙЦУКЕНГШЩЗФЫВАПРОЛДЯЧСМИТЬХЪЖБЮ'
+[ $# -eq 0 ] && set -- prefix copy-mode-vi
+conf=$(mktemp)
+for table in "$@"; do
+  for ((i = 0; i < ${#lat}; i++)); do
+    l=${lat:i:1} c=${cyr:i:1}
+    # list-keys prints "bind-key [-r] -T <table> <key> <command>": swap the key, keep the rest.
+    tmux list-keys -T "$table" -- "$l" 2>/dev/null | while IFS= read -r line; do
+      key=$(printf '%s' "$line" | awk '{for (j = 1; j < NF; j++) if ($j == "-T") { print $(j + 2); exit }}')
+      [ "$key" = "$l" ] || [ "$key" = "\\$l" ] || continue
+      printf '%s\n' "$line" | K="$key" C="$c" awk '{ k = ENVIRON["K"]; c = ENVIRON["C"]
+        n = index($0, " " k " "); print substr($0, 1, n) c substr($0, n + length(k) + 1) }'
+    done
+  done
+done >"$conf"
+tmux source-file "$conf"
+rm -f "$conf"
