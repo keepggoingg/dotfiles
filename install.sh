@@ -36,6 +36,8 @@ for pkg in "${PACKAGES[@]}"; do
   done < <(find "$DOTFILES/$pkg" -type f -print0)
 done
 stow --dir "$DOTFILES" --target "$HOME" --restow "${PACKAGES[@]}"
+# Generated colour files for Ghostty/tmux/btop (Tokyo Night Deep until you pick another look).
+"$HOME/.local/bin/looks" restore --no-reload || true
 
 # Private half of the Claude Code setup (memory, settings, plugin kits), if this account can read it.
 CLAUDE_PRIVATE="$HOME/dev/personal/claude-private"

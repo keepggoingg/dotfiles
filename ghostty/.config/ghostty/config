@@ -35,28 +35,9 @@ shell-integration-features = no-cursor
 # custom-shader = shaders/cursor_smear.glsl
 # custom-shader-animation = true
 
-# Tokyo Night (same values as kitty)
-foreground = #c0caf5
-background = #161621
-selection-background = #283457
-cursor-color = #c0caf5
-cursor-text = #1a1b26
-palette = 0=#1d202f
-palette = 1=#f7768e
-palette = 2=#9ece6a
-palette = 3=#e0af68
-palette = 4=#7aa2f7
-palette = 5=#bb9af7
-palette = 6=#7dcfff
-palette = 7=#a9b1d6
-palette = 8=#414868
-palette = 9=#f88b9f
-palette = 10=#afd784
-palette = 11=#e3b878
-palette = 12=#8baef8
-palette = 13=#ccb4f9
-palette = 14=#99daff
-palette = 15=#c0caf5
+# Colours: themes/Tokyo Night Deep. `looks` (bin) switches theme and font live and
+# writes looks.conf, included at the very end so it wins.
+theme = Tokyo Night Deep
 
 # tmux owns tabs/splits: free these keys like in kitty
 keybind = super+t=unbind
@@ -89,3 +70,6 @@ keybind = super+shift+z=csi:9001;6~
 keybind = super+a=csi:9001;7~
 keybind = super+b=csi:9001;8~
 keybind = super+w=csi:9001;9~
+
+# Written by `looks` (not in git); the leading ? makes it optional.
+config-file = ?looks.conf

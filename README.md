@@ -39,9 +39,12 @@
   lazygit in a popup. New terminal windows land back in the last session.
 - **zsh that starts in ~0.1 s.** antidote instead of oh-my-zsh, fzf-tab completion,
   autosuggestions, syntax highlighting, zoxide, eza, bat, starship, lazy-loaded SDKMAN.
-- **Ghostty with no tabs of its own.** JetBrains Mono Nerd Font, Option as Alt, Tokyo Night,
+- **Ghostty with no tabs of its own.** Maple Mono, Option as Alt, Tokyo Night,
   blur, a cursor-smear GLSL shader,
   a pill-style tmux bar and a fastfetch config for screenshots.
+- **`looks`: live theme and font picker.** A small TUI that steps through Ghostty's 800+
+  themes and your installed monospace fonts with the arrow keys or `hjkl`. Ghostty, the tmux
+  bar, btop and every open Neovim recolour on each step; `q` puts back what you had.
 - **Finder → Neovim.** **Open With → Open in Neovim** (a small AppleScript droplet built
   by `install.sh`) opens files in Neovim inside tmux, shows images inline (chafa) and
   runs scripts. kitty's config stays as a fallback and uses the same handler.
@@ -101,7 +104,7 @@ Each top-level folder is a stow package mirroring `$HOME`:
 | `starship` | `.config/starship.toml` |
 | `git`      | `.gitconfig` (identity in `~/.gitconfig.local`), `.config/git/ignore` |
 | `direnv`   | `.config/direnv/direnv.toml` |
-| `bin`      | `.local/bin/`: `tmux-sessionizer`, `tmux-attach-last`, `term-open`, `ssh-hosts-from-pass` |
+| `bin`      | `.local/bin/`: `tmux-sessionizer`, `tmux-attach-last`, `term-open`, `ssh-hosts-from-pass`, `looks` |
 | `ssh`      | `.ssh/config` defaults; hosts go in `~/.ssh/config.d/` |
 | `claude`   | `.claude/CLAUDE.md` (imports a private `CLAUDE.private.md`), `.local/bin/claude-statusline` |
 

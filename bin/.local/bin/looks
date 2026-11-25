@@ -1,0 +1,341 @@
+#!/usr/bin/env python3
+"""looks: browse Ghostty themes and fonts with live reload.
+
+Every change is applied right away to Ghostty (SIGUSR2 reload), tmux (source-file),
+btop (SIGUSR2) and Neovim (watches the state file). Run `looks` for the picker.
+
+Keys:  up/down or k/j  pick the row (theme / font)
+       left/right or h/l  previous / next     H/L  jump 10
+       /  search all themes    a  picks <-> all themes
+       enter  keep    q / esc  go back to what you had    ?  help
+
+CLI:   looks                 the picker
+       looks theme NAME      set a theme      looks font NAME   set a font
+       looks restore         rewrite generated files from the saved state (install, new machine)
+       looks list [themes|fonts]
+"""
+import curses, json, os, re, subprocess, sys, time
+
+HOME = os.path.expanduser("~")
+GHOSTTY_BIN = "/Applications/Ghostty.app/Contents/MacOS/ghostty"
+BUNDLED_THEMES = "/Applications/Ghostty.app/Contents/Resources/ghostty/themes"
+GHOSTTY_DIR = os.path.join(HOME, ".config/ghostty")
+USER_THEMES = os.path.join(GHOSTTY_DIR, "themes")
+STATE_DIR = os.path.join(os.environ.get("XDG_STATE_HOME", os.path.join(HOME, ".local/state")), "looks")
+STATE = os.path.join(STATE_DIR, "state.json")
+GHOSTTY_OUT = os.path.join(GHOSTTY_DIR, "looks.conf")           # included by ghostty/config
+TMUX_SRC = os.path.join(HOME, ".config/tmux/theme.conf")         # Tokyo Night source, tracked
+TMUX_OUT = os.path.join(STATE_DIR, "tmux.conf")                  # sourced after theme.conf
+BTOP_SRC = os.path.join(HOME, ".config/btop/themes/tokyo-night-term.theme")
+BTOP_OUT = os.path.join(HOME, ".config/btop/themes/looks.theme")
+
+DEFAULT_THEME = "Tokyo Night Deep"
+DEFAULT_FONT = "Maple Mono"
+PICKS = ["Tokyo Night Deep", "TokyoNight Night", "TokyoNight Storm", "TokyoNight Moon",
+         "Catppuccin Mocha", "Catppuccin Macchiato", "Rose Pine", "Rose Pine Moon",
+         "Kanagawa Wave", "Kanagawa Dragon", "Gruvbox Dark", "Gruvbox Material Dark",
+         "Everforest Dark Med", "Nord", "Dracula", "Atom One Dark", "One Half Dark", "Nightfox",
+         "Carbonfox", "Oxocarbon", "Poimandres", "Vesper", "Melange Dark", "Flexoki Dark",
+         "Moonfly", "Night Owl", "Iceberg Dark", "GitHub Dark Dimmed", "Ayu Mirage",
+         "Monokai Pro", "Solarized Osaka Night", "Zenbones Dark", "Catppuccin Latte",
+         "Rose Pine Dawn", "TokyoNight Day", "Flexoki Light", "Gruvbox Light"]
+MONO_HINT = re.compile(r"mono|code|iosevka|menlo|plex|cascadia|fira|consol|courier|hack|sf mono", re.I)
+
+# The tracked tmux and btop files are written in "Tokyo Night Deep" colours. Each hex there
+# stands for a role; a new theme fills the same roles with its own colours.
+TOKYO_ROLES = {
+    "#161621": "bg", "#1a1b26": "on_accent", "#c0caf5": "fg", "#283457": "sel",
+    "#292e42": "surface", "#565f89": "muted", "#1d202f": "p0", "#a9b1d6": "p7", "#414868": "p8",
+    "#f7768e": "p1", "#9ece6a": "p2", "#e0af68": "p3", "#7aa2f7": "p4", "#bb9af7": "p5",
+    "#7dcfff": "p6", "#f88b9f": "p9", "#afd784": "p10", "#e3b878": "p11", "#8baef8": "p12",
+    "#ccb4f9": "p13", "#99daff": "p14",
+}
+
+
+# ---------------------------------------------------------------- colours and themes
+def mix(a, b, t):
+    a, b = [int(a[i:i + 2], 16) for i in (1, 3, 5)], [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#%02x%02x%02x" % tuple(round(x + (y - x) * t) for x, y in zip(a, b))
+
+
+def luminance(h):
+    return sum(w * int(h[i:i + 2], 16) / 255 for w, i in ((.2126, 1), (.7152, 3), (.0722, 5)))
+
+
+def theme_path(name):
+    for d in (USER_THEMES, BUNDLED_THEMES):
+        p = os.path.join(d, name)
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+def all_themes():
+    names = set()
+    for d in (USER_THEMES, BUNDLED_THEMES):
+        if os.path.isdir(d):
+            names.update(n for n in os.listdir(d) if not n.startswith("."))
+    return sorted(names, key=str.lower)
+
+
+def norm(v):
+    v = v.strip().strip('"').lower()
+    return v if v.startswith("#") else "#" + v
+
+
+def roles(name):
+    """Read a Ghostty theme file into named colour roles."""
+    path = theme_path(name)
+    if not path:
+        raise SystemExit(f"looks: no theme called {name!r} (try `looks list themes`)")
+    pal, kv = {}, {}
+    for line in open(path, encoding="utf-8", errors="replace"):
+        if "=" not in line or line.lstrip().startswith("#"):
+            continue
+        k, v = (s.strip() for s in line.split("=", 1))
+        if k == "palette":
+            i, c = v.split("=", 1)
+            pal[int(i)] = norm(c)
+        else:
+            kv[k] = v
+    bg, fg = norm(kv.get("background", "#000000")), norm(kv.get("foreground", "#ffffff"))
+    r = {"bg": bg, "fg": fg}
+    for i in range(16):
+        r[f"p{i}"] = pal.get(i, pal.get(i - 8, fg) if i >= 8 else fg)
+    # Selection backgrounds sit under normal text in tmux/btop/nvim, so only keep the theme's own
+    # one if it is closer to the background than to the text (Catppuccin's is a light pink).
+    sel = norm(kv["selection-background"]) if "selection-background" in kv else None
+    lb, lf = luminance(bg), luminance(fg)
+    r["sel"] = sel if sel and abs(luminance(sel) - lb) < abs(luminance(sel) - lf) else mix(bg, r["p4"], .3)
+    r["surface"] = mix(bg, fg, .12)
+    r["muted"] = mix(bg, fg, .38)
+    r["on_accent"] = bg  # text drawn on an accent-coloured block
+    r["light"] = luminance(bg) > .5
+    if name == DEFAULT_THEME:  # the tracked files' own shades, so the default round-trips exactly
+        r.update(surface="#292e42", muted="#565f89", on_accent="#1a1b26")
+    return r
+
+
+def recolour(text, r):
+    return re.sub(r"#[0-9a-fA-F]{6}", lambda m: r.get(TOKYO_ROLES.get(m.group(0).lower(), ""), m.group(0)), text)
+
+
+# ---------------------------------------------------------------- fonts
+_fonts = None
+
+
+def fonts(current):
+    global _fonts
+    if _fonts is None:
+        try:
+            out = subprocess.run([GHOSTTY_BIN, "+list-fonts"], capture_output=True, text=True, timeout=20).stdout
+        except (OSError, subprocess.TimeoutExpired):
+            out = ""
+        fams = {l.strip() for l in out.splitlines() if l and not l[0].isspace()}
+        _fonts = sorted((f for f in fams if MONO_HINT.search(f)), key=str.lower)
+    if current not in _fonts:
+        _fonts.insert(0, current)
+    return _fonts
+
+
+# ---------------------------------------------------------------- state and apply
+def load_state():
+    try:
+        with open(STATE) as f:
+            s = json.load(f)
+    except (OSError, ValueError):
+        s = {}
+    return {"theme": s.get("theme", DEFAULT_THEME), "font": s.get("font", DEFAULT_FONT)}
+
+
+def write(path, text):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        f.write(text)
+    os.replace(tmp, path)  # atomic, so watchers never see half a file
+
+
+def run(*cmd):
+    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def apply(theme, font, reload=True):
+    r = roles(theme)
+    write(GHOSTTY_OUT, "# Written by `looks`; do not edit (not in git).\n"
+                       f'theme = {theme}\nfont-family = ""\nfont-family = "{font}"\n')
+    if os.path.isfile(TMUX_SRC):
+        write(TMUX_OUT, "# Written by `looks` from theme.conf\n" + recolour(open(TMUX_SRC).read(), r))
+    if os.path.isfile(BTOP_SRC):
+        write(BTOP_OUT, f"# Written by `looks` for {theme}\n" + recolour(open(BTOP_SRC).read(), r))
+    write(STATE, json.dumps({"theme": theme, "font": font, "roles": r,
+                             "native": theme == DEFAULT_THEME}, indent=1) + "\n")
+    if reload:
+        run("pkill", "-USR2", "-x", "ghostty")
+        run("pkill", "-USR2", "-x", "btop")
+        if os.path.isfile(TMUX_OUT):
+            run("tmux", "source-file", TMUX_OUT)
+
+
+# ---------------------------------------------------------------- picker
+SAMPLE = [  # (palette index or -1 for default, text) segments per line
+    [(4, "~/dev/result/eearly "), (5, "development "), (2, "❯ "), (-1, "flutter test")],
+    [(2, "00:04 +42: All tests passed!  "), (1, "1 failed")],
+    [],
+    [(8, "// Read a blood pressure cuff over BLE")],
+    [(5, "final "), (-1, "reading = "), (5, "await "), (-1, "device."), (6, "read"), (-1, "();")],
+    [(5, "if "), (-1, "(reading.systolic >= "), (3, "140"), (-1, ") log("), (2, "'high'"), (-1, ");")],
+    [(-1, "0O oO Il1| => != === <= -> :: www ++")],
+]
+HELP = "↑↓/jk row   ←→/hl change   H/L ±10   / search   a picks/all   enter keep   q back"
+
+
+class Picker:
+    def __init__(self, scr):
+        self.scr, self.start = scr, load_state()
+        self.all = False
+        self.query = ""
+        self.row = 0  # 0 theme, 1 font
+        self.theme, self.font = self.start["theme"], self.start["font"]
+        self.dirty_at = None
+        curses.curs_set(0)
+        curses.use_default_colors()
+        for i in range(16):
+            curses.init_pair(i + 1, i, -1)
+            curses.init_pair(i + 17, -1, i)
+        scr.timeout(120)
+
+    def theme_list(self):
+        names = all_themes() if self.all or self.query else [t for t in PICKS if theme_path(t)]
+        if self.query:
+            names = [n for n in names if self.query.lower() in n.lower()]
+        return names or [self.theme]
+
+    def step(self, d):
+        if self.row == 0:
+            lst = self.theme_list()
+            i = lst.index(self.theme) if self.theme in lst else -1
+            self.theme = lst[max(0, min(len(lst) - 1, i + d))] if i >= 0 else lst[0]
+        else:
+            lst = fonts(self.font)
+            self.font = lst[(lst.index(self.font) + d) % len(lst)]
+        self.dirty_at = time.monotonic()
+
+    def search(self):
+        h, w = self.scr.getmaxyx()
+        curses.curs_set(1)
+        self.scr.timeout(-1)
+        q = ""
+        while True:
+            self.scr.addstr(h - 1, 0, ("/" + q)[: w - 1].ljust(w - 1))
+            k = self.scr.get_wch()
+            if k in ("\n", "\r"):
+                break
+            if k == "\x1b":
+                q = ""
+                break
+            if k in ("\x7f", "\b", curses.KEY_BACKSPACE):
+                q = q[:-1]
+            elif isinstance(k, str) and k.isprintable():
+                q += k
+        curses.curs_set(0)
+        self.scr.timeout(120)
+        self.query, self.row = q, 0
+        lst = self.theme_list()
+        if self.theme not in lst:
+            self.theme, self.dirty_at = lst[0], time.monotonic()
+
+    def put(self, y, x, s, attr=0):
+        h, w = self.scr.getmaxyx()
+        if 0 <= y < h and x < w:
+            self.scr.addstr(y, x, s[: max(0, w - x - 1)], attr)
+
+    def draw(self):
+        s = self.scr
+        s.erase()
+        lst, fl = self.theme_list(), fonts(self.font)
+        ti = lst.index(self.theme) + 1 if self.theme in lst else 0
+        mode = f"search '{self.query}'" if self.query else ("all themes" if self.all else "picks")
+        self.put(0, 1, "looks", curses.A_BOLD)
+        self.put(0, 8, "live Ghostty, tmux, btop and Neovim", curses.color_pair(9))
+        rows = [("Theme", self.theme, f"{ti}/{len(lst)}  {mode}"),
+                ("Font", self.font, f"{fl.index(self.font) + 1}/{len(fl)}")]
+        for i, (label, val, info) in enumerate(rows):
+            sel = i == self.row
+            self.put(2 + i, 1, ("▸ " if sel else "  ") + label.ljust(7), curses.A_BOLD if sel else 0)
+            self.put(2 + i, 11, f"◂ {val} ▸", (curses.A_REVERSE | curses.A_BOLD) if sel else curses.A_BOLD)
+            self.put(2 + i, 16 + len(val), info, curses.color_pair(9))
+        if self.theme in lst and len(lst) > 1:
+            j = lst.index(self.theme)
+            self.put(5, 3, "prev " + (lst[j - 1] if j else "—"), curses.color_pair(9))
+            self.put(5, 34, "next " + (lst[j + 1] if j + 1 < len(lst) else "—"), curses.color_pair(9))
+        for r in range(2):
+            for i in range(8):
+                self.put(7 + r, 3 + i * 5, "    ", curses.color_pair(17 + r * 8 + i))
+        for y, segs in enumerate(SAMPLE):
+            x = 3
+            for c, t in segs:
+                self.put(10 + y, x, t, curses.color_pair(c + 1) if c >= 0 else 0)
+                x += len(t)
+        self.put(10 + len(SAMPLE) + 1, 1, HELP, curses.color_pair(9))
+        s.refresh()
+
+    def loop(self):
+        while True:
+            self.draw()
+            try:
+                k = self.scr.get_wch()
+            except curses.error:
+                k = None
+            if k is None:
+                if self.dirty_at and time.monotonic() - self.dirty_at > .1:
+                    apply(self.theme, self.font)
+                    self.dirty_at = None
+                continue
+            if k in (curses.KEY_UP, "k"):
+                self.row = 0
+            elif k in (curses.KEY_DOWN, "j"):
+                self.row = 1
+            elif k in (curses.KEY_LEFT, "h"):
+                self.step(-1)
+            elif k in (curses.KEY_RIGHT, "l"):
+                self.step(1)
+            elif k == "H":
+                self.step(-10)
+            elif k == "L":
+                self.step(10)
+            elif k == "/":
+                self.search()
+            elif k == "a":
+                self.all, self.query = not self.all, ""
+            elif k in ("\n", "\r", curses.KEY_ENTER):
+                apply(self.theme, self.font)
+                return f"kept {self.theme} · {self.font}"
+            elif k in ("q", "\x1b"):
+                apply(self.start["theme"], self.start["font"])
+                return f"back to {self.start['theme']} · {self.start['font']}"
+
+
+def main(argv):
+    if not argv:
+        os.environ.setdefault("ESCDELAY", "25")
+        print(curses.wrapper(lambda scr: Picker(scr).loop()))
+        return
+    cmd, rest = argv[0], " ".join(argv[1:]).strip()
+    st = load_state()
+    if cmd in ("-h", "--help", "help"):
+        print(__doc__.strip())
+    elif cmd == "restore":
+        apply(st["theme"], st["font"], reload="--no-reload" not in argv)
+    elif cmd == "theme" and rest:
+        apply(rest, st["font"])
+    elif cmd == "font" and rest:
+        apply(st["theme"], rest)
+    elif cmd == "list":
+        print("\n".join(fonts(st["font"]) if rest == "fonts" else all_themes()))
+    else:
+        raise SystemExit(__doc__.strip())
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

@@ -1,1 +1,4 @@
 .DS_Store
+ghostty/.config/ghostty/looks.conf
+btop/.config/btop/themes/looks.theme
+*.tmp
