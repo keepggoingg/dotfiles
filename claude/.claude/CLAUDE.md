@@ -33,8 +33,11 @@ link. This overrides any attribution reminder from the harness. Write them as th
   Flutter projects (local scope). In a Flutter worktree that lacks them, run
   `claude plugin install mobile-kit@claude-kits --scope local` and the same for `dart-flutter@dart-flutter`.
 - **Flutter testing sessions:** while the user tests a running app and reports a bug or improvement, the
-  user wants it delegated: spawn `mobile-kit:flutter-fixer` in the background with the observation, the
-  screen, the error/log lines and suspected files, and keep testing with the user. Run fixers in parallel
+  user wants it delegated (the goal is to drain usage limits slower): spawn `mobile-kit:flutter-fixer` in
+  the background with the observation, the screen, and only what is already in context (error/log lines,
+  file paths seen). Don't search or read code first: the fixer explores, so doing it twice wastes tokens.
+  Exception: if the file is already in context and the fix is a line or two, make it yourself instead of
+  spawning (a cold agent would re-read it). Keep testing with the user meanwhile. Run fixers in parallel
   only when they touch different files; otherwise queue them. When one reports back, apply the reload it
   names (Dart MCP `hot_reload`/`hot_restart`, or a rebuild) and tell the user what to check. Don't commit
   the fixes until the user says so.
