@@ -32,6 +32,13 @@ link. This overrides any attribution reminder from the harness. Write them as th
 - `mobile-kit` (flutter-sim-testing, ios-simulator-skill, ios-upload) and `dart-flutter` are enabled only in
   Flutter projects (local scope). In a Flutter worktree that lacks them, run
   `claude plugin install mobile-kit@claude-kits --scope local` and the same for `dart-flutter@dart-flutter`.
+- **Flutter testing sessions:** while the user tests a running app and reports a bug or improvement, the
+  user wants it delegated: spawn `mobile-kit:flutter-fixer` in the background with the observation, the
+  screen, the error/log lines and suspected files, and keep testing with the user. Run fixers in parallel
+  only when they touch different files; otherwise queue them. When one reports back, apply the reload it
+  names (Dart MCP `hot_reload`/`hot_restart`, or a rebuild) and tell the user what to check. Don't commit
+  the fixes until the user says so.
+- Subagents for noisy output: `log-digger` for long logs/build failures, `minotebook-ops` for homelab health.
 - `design-kit` (logo-designer, web-asset-generator, imagen) is off. When a task needs a logo, favicons/OG
   images or generated images, tell the user to run `/plugin enable design-kit@claude-kits` (or do it with
   their OK).
