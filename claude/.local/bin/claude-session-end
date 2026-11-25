@@ -1,0 +1,35 @@
+#!/bin/zsh
+# Claude Code SessionEnd hook (work and personal profiles share it).
+# On exit of an interactive chat: copy a ready-to-paste resume command to the clipboard and
+# remember the chat in ~/.local/state/claude/closed-sessions.tsv (newest last) for
+# claude-resume-last (tmux right-click menu "Resume closed chat"). /clear is skipped.
+input=$(cat)
+read -r sid cwd reason < <(print -r -- "$input" | /usr/bin/python3 -c '
+import json,sys; d=json.load(sys.stdin)
+print(d.get("session_id",""), d.get("cwd","").replace(" ","\\x20"), d.get("reason",""))')
+cwd=${cwd//\\x20/ }
+[[ -z $sid || $reason == clear ]] && exit 0
+# Only interactive chats: find the claude process above us (hooks run detached from the
+# terminal), skip if it has no terminal or was started with -p/--print (scripts, SDK runs).
+p=$PPID; interactive=0
+for i in {1..6}; do
+  [[ -z $p || $p -le 1 ]] && break
+  if [[ $(ps -o comm= -p $p) == *claude ]]; then
+    tty=$(ps -o tty= -p $p | tr -d ' ')
+    args=" $(ps -o args= -p $p) "
+    [[ -n $tty && $tty != '??' && $args != *" -p "* && $args != *" --print "* ]] && interactive=1
+    break
+  fi
+  p=$(ps -o ppid= -p $p | tr -d ' ')
+done
+(( interactive || ${CLAUDE_SESSION_END_FORCE:-0} )) || exit 0
+
+if [[ $CLAUDE_CONFIG_DIR == $HOME/.claude-personal ]]; then profile=personal; cmd=claude-personal
+else profile=work; cmd=claude; fi
+
+print -rn -- "cd ${(q)cwd} && $cmd --resume $sid" | pbcopy
+state=$HOME/.local/state/claude; mkdir -p $state
+print -r -- "$(date +%Y-%m-%dT%H:%M:%S)	$profile	$sid	$cwd" >> $state/closed-sessions.tsv
+tail -n 50 $state/closed-sessions.tsv > $state/.tmp && mv $state/.tmp $state/closed-sessions.tsv
+[[ -n $TMUX ]] && tmux display "Claude $profile resume command copied" 2>/dev/null
+exit 0
