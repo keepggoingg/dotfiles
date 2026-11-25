@@ -39,7 +39,9 @@ PICKS = ["Tokyo Night Deep", "TokyoNight Night", "TokyoNight Storm", "TokyoNight
          "Moonfly", "Night Owl", "Iceberg Dark", "GitHub Dark Dimmed", "Ayu Mirage",
          "Monokai Pro", "Solarized Osaka Night", "Zenbones Dark", "Catppuccin Latte",
          "Rose Pine Dawn", "TokyoNight Day", "Flexoki Light", "Gruvbox Light"]
-MONO_HINT = re.compile(r"mono|code|iosevka|menlo|plex|cascadia|fira|consol|courier|hack|sf mono", re.I)
+# Fonts `ghostty +list-fonts` leaves out of its full list but finds when asked by name.
+PROBE_FONTS = ["CommitMono", "SF Mono"]
+MONO_HINT = re.compile(r"mono|monaspace|code|iosevka|menlo|plex|cascadia|fira|consol|courier|hack|sf mono", re.I)
 
 # The tracked tmux and btop files are written in "Tokyo Night Deep" colours. Each hex there
 # stands for a role; a new theme fills the same roles with its own colours.
@@ -132,6 +134,16 @@ def fonts(current):
         except (OSError, subprocess.TimeoutExpired):
             out = ""
         fams = {l.strip() for l in out.splitlines() if l and not l[0].isspace()}
+        for name in PROBE_FONTS:
+            if name in fams:
+                continue
+            try:
+                hit = subprocess.run([GHOSTTY_BIN, "+list-fonts", f"--family={name}"],
+                                     capture_output=True, text=True, timeout=10).stdout
+            except (OSError, subprocess.TimeoutExpired):
+                hit = ""
+            if hit.strip():
+                fams.add(name)
         _fonts = sorted((f for f in fams if MONO_HINT.search(f)), key=str.lower)
     if current not in _fonts:
         _fonts.insert(0, current)
