@@ -40,7 +40,9 @@ link. This overrides any attribution reminder from the harness. Write them as th
   spawning (a cold agent would re-read it). Keep testing with the user meanwhile. Run fixers in parallel
   only when they touch different files; otherwise queue them. When one reports back, apply the reload it
   names (Dart MCP `hot_reload`/`hot_restart`, or a rebuild) and tell the user what to check. Don't commit
-  the fixes until the user says so.
+  the fixes until the user says so. Backend problems found while testing (a Spring/Maven service, e.g.
+  a Result service running locally) go the same way to `result-kit:backend-fixer`; after it reports,
+  rebuild and restart the local instance as its report says.
 - Subagents for noisy output: `log-digger` for long logs/build failures, `minotebook-ops` for homelab health.
 - `design-kit` (logo-designer, web-asset-generator, imagen) is off. When a task needs a logo, favicons/OG
   images or generated images, tell the user to run `/plugin enable design-kit@claude-kits` (or do it with
