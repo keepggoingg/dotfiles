@@ -46,6 +46,12 @@ if [[ ! -d "$CLAUDE_PRIVATE" ]] && command -v gh >/dev/null && gh repo view keep
 fi
 [[ -x "$CLAUDE_PRIVATE/bin/restore" ]] && "$CLAUDE_PRIVATE/bin/restore" || true
 
+# GitHub profile README with the Claude Code hours card; its ledger lives in the repo, so
+# the count carries over. The LaunchAgent updates and pushes it daily at 22:00.
+PROFILE="$HOME/dev/personal/keepggoingg"
+[[ -d "$PROFILE" ]] || git clone git@github.com:keepggoingg/keepggoingg.git "$PROFILE" || true
+[[ -x "$PROFILE/scripts/install-launchagent.sh" ]] && "$PROFILE/scripts/install-launchagent.sh" || true
+
 [[ -f "$HOME/.z" ]] && command -v zoxide >/dev/null && zoxide import z --merge || true
 "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" || true
 "$DOTFILES/macos/build-open-in-neovim.sh" || echo "Open in Neovim.app build failed; continuing"

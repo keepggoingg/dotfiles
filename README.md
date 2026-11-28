@@ -78,7 +78,8 @@ git clone https://github.com/keepggoingg/dotfiles.git ~/dev/personal/dotfiles
 
 `install.sh` runs `brew bundle`, installs SDKMAN, TPM and the tmux plugins, moves any
 conflicting files to `~/.dotfiles-backup/<date>/`, stows every package and builds
-`Open in Neovim.app`.
+`Open in Neovim.app`. It also clones the `keepggoingg` profile repo and sets up the daily
+job that updates the Claude Code hours card on it.
 Then put your git name and email in `~/.gitconfig.local`:
 
 ```ini
